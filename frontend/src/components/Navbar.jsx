@@ -6,11 +6,11 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   return (
-    <div className='flex items-center justify-between px-8 py-4 bg-slate-800'>
+    <div className='flex items-center justify-between px-8 py-4 bg-slate-500'>
 
-      <img src={logo} alt="Logo" className='h-10 w-auto' />
+      <img src={logo} alt="Logo" className='h-25 w-auto' />
 
-      <div className='flex items-center space-x-6'>
+      <div className='flex items-center space-x-10 text-2xl'>
         <Link to="/product">  Product  </Link>
         <Link to="/about">    About Us </Link>
         <Link to="/login">    Login    </Link>

@@ -5,6 +5,7 @@ import heroImg from './assets/hero.png'
 import './App.css'
 import Navbar from './components/Navbar'
 import {BrowserRouter, Routes, Route} from "react-router-dom"
+import Dashboard from './components/Dashboard'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -13,7 +14,7 @@ function App() {
     <>
     <BrowserRouter>
      <Routes>
-      <Route path='/navbar' element={<Navbar/>}/>
+      <Route path='/' element={<Dashboard/>}/>
      </Routes>
     </BrowserRouter>
     </>
