@@ -3,16 +3,21 @@ import Navbar from './navbar'
 import Intro from './Intro'
 import Detail from './Detail'
 import SocialMedia from './SocialMedia'
+import Rotation from './Rotation'
+import Unique from './Unique'
+import FAQ from './FAQ'
 
-const Dashboard = () => {
+const LandingPage = () => {
   return (
     <>
         <Navbar/>
         <Intro/>
         <Detail/>
+        <Rotation/>
+        <Unique/>
         <SocialMedia/>
     </>
   )
 }
 
-export default Dashboard
+export default LandingPage

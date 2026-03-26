@@ -22,9 +22,9 @@ const Detail = () => {
           <button className='bg-[#56bd41] flex items-center justify-evenly h-15 w-50 rounded-4xl text-[#ffffff] hover:bg-[#1f9e4e] duration-100 ease-in hover:border-1 border-black text-xl font-bold'>Learn More <img className='h-10' src={arrow} alt="arrow" /></button>
         </div>
     </div>
-    <div className='h-200 py-20 px-20 flex flex-col items-center justify-start gap-10'>
+    <div className='h-200 w-full pt-20 px-20 flex flex-col items-center justify-start gap-10'>
         <h1 className='text-4xl font-bold'> Smart management for a better living experience </h1>
-        <div className='h-200 w-400 bg-gradient-to-r from-[#5b42e4] via-[#8137e9] to-[#7f32da] rounded-4xl'>
+        <div className='h-200 w-3/4 bg-gradient-to-r from-[#5b42e4] via-[#8137e9] to-[#7f32da] rounded-4xl shadow-2xl'>
           
         </div>
     </div>

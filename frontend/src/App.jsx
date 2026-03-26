@@ -4,7 +4,7 @@ import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
 import {BrowserRouter, Routes, Route} from "react-router-dom"
-import Dashboard from './components/Dashboard'
+import LandingPage from './components/LandingPage'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -13,7 +13,7 @@ function App() {
     <>
     <BrowserRouter>
      <Routes>
-      <Route index element={<Dashboard/>}/>
+      <Route index element={<LandingPage/>}/>
      </Routes>
     </BrowserRouter>
     </>
