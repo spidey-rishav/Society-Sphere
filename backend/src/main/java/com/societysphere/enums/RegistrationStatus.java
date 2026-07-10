@@ -1,15 +1,11 @@
 package com.societysphere.enums;
 
-public enum VisitorStatus {
+public enum RegistrationStatus {
 
     PENDING,
 
     APPROVED,
 
-    ENTERED,
-
-    EXITED,
-
     REJECTED
-    
+
 }
