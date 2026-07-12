@@ -1,28 +1,62 @@
-package com.societysphere.dto.subscription;
+package com.societysphere.mapper;
 
-import java.math.BigDecimal;
+import com.societysphere.dto.subscription.SubscriptionPlanRequest;
+import com.societysphere.dto.subscription.SubscriptionPlanResponse;
+import com.societysphere.entity.SubscriptionPlan;
 
-import lombok.Getter;
-import lombok.Setter;
+public final class SubscriptionPlanMapper {
 
-@Getter
-@Setter
-public class SubscriptionPlanResponse {
+    private SubscriptionPlanMapper() {
+    }
 
-    private Long id;
+    public static SubscriptionPlan toEntity(SubscriptionPlanRequest request) {
 
-    private String planName;
+        if (request == null) {
+            return null;
+        }
 
-    private String description;
+        SubscriptionPlan subscriptionPlan = new SubscriptionPlan();
 
-    private BigDecimal price;
+        subscriptionPlan.setName(request.getPlanName());
+        subscriptionPlan.setDescription(request.getDescription());
+        subscriptionPlan.setPrice(request.getPrice());
 
-    private Integer durationInMonths;
+        if (request.getDurationInMonths() != null) {
+            subscriptionPlan.setDurationInDays(request.getDurationInMonths() * 30);
+        }
 
-    private Integer maxFlats;
+        subscriptionPlan.setMaxFlats(request.getMaxFlats());
+        subscriptionPlan.setMaxResidents(request.getMaxResidents());
 
-    private Integer maxResidents;
+        if (request.getIsActive() != null) {
+            subscriptionPlan.setActive(request.getIsActive());
+        }
 
-    private Boolean isActive;
+        return subscriptionPlan;
+    }
+
+    public static SubscriptionPlanResponse toResponse(SubscriptionPlan subscriptionPlan) {
+
+        if (subscriptionPlan == null) {
+            return null;
+        }
+
+        SubscriptionPlanResponse response = new SubscriptionPlanResponse();
+
+        response.setId(subscriptionPlan.getId());
+        response.setPlanName(subscriptionPlan.getName());
+        response.setDescription(subscriptionPlan.getDescription());
+        response.setPrice(subscriptionPlan.getPrice());
+
+        if (subscriptionPlan.getDurationInDays() != null) {
+            response.setDurationInMonths(subscriptionPlan.getDurationInDays() / 30);
+        }
+
+        response.setMaxFlats(subscriptionPlan.getMaxFlats());
+        response.setMaxResidents(subscriptionPlan.getMaxResidents());
+        response.setIsActive(subscriptionPlan.getActive());
+
+        return response;
+    }
 
 }
