@@ -17,14 +17,13 @@ public final class SocietyRegistrationMapper {
 
         return SocietyRegistration.builder()
                 .societyName(requestDTO.getSocietyName())
-                .address(requestDTO.getAddress())
+                .societyAddress(requestDTO.getSocietyAddress())
                 .city(requestDTO.getCity())
                 .state(requestDTO.getState())
                 .pincode(requestDTO.getPincode())
                 .contactPersonName(requestDTO.getContactPersonName())
                 .contactNumber(requestDTO.getContactNumber())
                 .email(requestDTO.getEmail())
-                .numberOfFlats(requestDTO.getNumberOfFlats())
                 .build();
     }
 
@@ -36,17 +35,16 @@ public final class SocietyRegistrationMapper {
         }
 
         return SocietyRegistrationResponseDTO.builder()
-                .id(registration.getId())
+                .id(registration.getRegistrationId())
                 .societyName(registration.getSocietyName())
-                .address(registration.getAddress())
+                .societyAddress(registration.getSocietyAddress())
                 .city(registration.getCity())
                 .state(registration.getState())
                 .pincode(registration.getPincode())
                 .contactPersonName(registration.getContactPersonName())
                 .contactNumber(registration.getContactNumber())
                 .email(registration.getEmail())
-                .numberOfFlats(registration.getNumberOfFlats())
-                .status(registration.getStatus())
+                .status(registration.getRegistrationStatus())
                 .createdAt(registration.getCreatedAt())
                 .updatedAt(registration.getUpdatedAt())
                 .build();

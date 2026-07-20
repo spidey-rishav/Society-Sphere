@@ -20,13 +20,10 @@ public interface ComplaintFeedbackRepository extends JpaRepository<ComplaintFeed
 
     List<ComplaintFeedback> findBySociety(Society society);
 
-    List<ComplaintFeedback> findByFeedbackRating(FeedbackRating feedbackRating);
+    // ComplaintFeedback entity has 'rating' field, not 'feedbackRating'
+    List<ComplaintFeedback> findByRating(FeedbackRating rating);
 
-    List<ComplaintFeedback> findBySocietyAndFeedbackRating(
-            Society society,
-            FeedbackRating feedbackRating
-    );
+    List<ComplaintFeedback> findBySocietyAndRating(Society society, FeedbackRating rating);
 
     long countBySociety(Society society);
-
 }

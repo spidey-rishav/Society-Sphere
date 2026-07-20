@@ -1,7 +1,7 @@
 package com.societysphere.dto.user;
 
 import com.societysphere.enums.UserRole;
-import com.societysphere.enums.UserStatus;
+import com.societysphere.enums.AccountStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +19,6 @@ public class UserResponse {
 
     private UserRole role;
 
-    private UserStatus status;
+    private AccountStatus status;
 
 }

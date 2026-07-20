@@ -1,41 +1,32 @@
 package com.societysphere.dto.resident;
 
-import java.time.LocalDate;
-
 import com.societysphere.enums.Gender;
 import com.societysphere.enums.ResidentType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import lombok.Getter;
-import lombok.Setter;
+import java.time.LocalDate;
+import java.util.UUID;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ResidentResponse {
-
     private Long id;
-
-    private Long userId;
-
+    private UUID publicId;
     private String fullName;
-
     private String email;
-
     private String mobileNumber;
-
-    private Long societyId;
-
-    private String societyName;
-
-    private Long flatId;
-
-    private String flatNumber;
-
-    private ResidentType residentType;
-
     private Gender gender;
-
+    private ResidentType residentType;
+    private String flatNumber;
+    private String blockName;
+    private String societyName;
+    private Boolean active;
     private LocalDate dateOfBirth;
-
-    private LocalDate moveInDate;
-
+    private String occupation;
+    private String profileImage;
 }

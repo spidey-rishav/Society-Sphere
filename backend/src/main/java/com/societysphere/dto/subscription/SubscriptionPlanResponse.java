@@ -1,62 +1,18 @@
-package com.societysphere.mapper;
+package com.societysphere.dto.subscription;
 
-import com.societysphere.dto.subscription.SubscriptionPlanRequest;
-import com.societysphere.dto.subscription.SubscriptionPlanResponse;
-import com.societysphere.entity.SubscriptionPlan;
+import lombok.Getter;
+import lombok.Setter;
+import java.math.BigDecimal;
 
-public final class SubscriptionPlanMapper {
-
-    private SubscriptionPlanMapper() {
-    }
-
-    public static SubscriptionPlan toEntity(SubscriptionPlanRequest request) {
-
-        if (request == null) {
-            return null;
-        }
-
-        SubscriptionPlan subscriptionPlan = new SubscriptionPlan();
-
-        subscriptionPlan.setName(request.getPlanName());
-        subscriptionPlan.setDescription(request.getDescription());
-        subscriptionPlan.setPrice(request.getPrice());
-
-        if (request.getDurationInMonths() != null) {
-            subscriptionPlan.setDurationInDays(request.getDurationInMonths() * 30);
-        }
-
-        subscriptionPlan.setMaxFlats(request.getMaxFlats());
-        subscriptionPlan.setMaxResidents(request.getMaxResidents());
-
-        if (request.getIsActive() != null) {
-            subscriptionPlan.setActive(request.getIsActive());
-        }
-
-        return subscriptionPlan;
-    }
-
-    public static SubscriptionPlanResponse toResponse(SubscriptionPlan subscriptionPlan) {
-
-        if (subscriptionPlan == null) {
-            return null;
-        }
-
-        SubscriptionPlanResponse response = new SubscriptionPlanResponse();
-
-        response.setId(subscriptionPlan.getId());
-        response.setPlanName(subscriptionPlan.getName());
-        response.setDescription(subscriptionPlan.getDescription());
-        response.setPrice(subscriptionPlan.getPrice());
-
-        if (subscriptionPlan.getDurationInDays() != null) {
-            response.setDurationInMonths(subscriptionPlan.getDurationInDays() / 30);
-        }
-
-        response.setMaxFlats(subscriptionPlan.getMaxFlats());
-        response.setMaxResidents(subscriptionPlan.getMaxResidents());
-        response.setIsActive(subscriptionPlan.getActive());
-
-        return response;
-    }
-
+@Getter
+@Setter
+public class SubscriptionPlanResponse {
+    private Long id;
+    private String planName;
+    private String description;
+    private BigDecimal price;
+    private Integer durationInMonths;
+    private Integer maxFlats;
+    private Integer maxResidents;
+    private Boolean isActive;
 }

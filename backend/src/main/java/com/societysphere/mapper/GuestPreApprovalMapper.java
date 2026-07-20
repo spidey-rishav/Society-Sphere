@@ -37,35 +37,14 @@ public final class GuestPreApprovalMapper {
             return null;
         }
 
-        GuestPreApprovalResponse response = new GuestPreApprovalResponse();
-
-        response.setId(guestPreApproval.getId());
-
-        if (guestPreApproval.getResident() != null) {
-
-            response.setResidentId(guestPreApproval.getResident().getId());
-            response.setResidentName(guestPreApproval.getResident().getFullName());
-
-            if (guestPreApproval.getResident().getFlat() != null) {
-                response.setFlatNumber(
-                        guestPreApproval.getResident().getFlat().getFlatNumber()
-                );
-            }
-        }
-
-        response.setGuestName(guestPreApproval.getGuestName());
-        response.setGuestMobileNumber(guestPreApproval.getGuestMobileNumber());
-        response.setPurpose(guestPreApproval.getPurpose());
-
-        if (guestPreApproval.getExpectedArrivalTime() != null) {
-            response.setVisitDate(
-                    guestPreApproval.getExpectedArrivalTime().toLocalDate()
-            );
-        }
-
-        response.setStatus(guestPreApproval.getApprovalStatus());
-
-        return response;
+        return GuestPreApprovalResponse.builder()
+                .id(guestPreApproval.getId())
+                .guestName(guestPreApproval.getGuestName())
+                .guestMobileNumber(guestPreApproval.getGuestMobileNumber())
+                .purpose(guestPreApproval.getPurpose())
+                .expectedArrivalTime(guestPreApproval.getExpectedArrivalTime())
+                .approvalStatus(guestPreApproval.getApprovalStatus())
+                .build();
     }
 
 }

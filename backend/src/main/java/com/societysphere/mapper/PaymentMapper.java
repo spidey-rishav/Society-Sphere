@@ -32,33 +32,18 @@ public final class PaymentMapper {
             return null;
         }
 
-        PaymentResponse response = new PaymentResponse();
-
-        response.setPaymentId(payment.getPaymentId());
+        PaymentResponse.PaymentResponseBuilder builder = PaymentResponse.builder()
+                .id(payment.getPaymentId());
 
         if (payment.getComplaint() != null) {
-            response.setComplaintId(payment.getComplaint().getId());
-            response.setComplaintTitle(payment.getComplaint().getTitle());
+            builder.complaintId(payment.getComplaint().getId());
         }
 
-        if (payment.getResident() != null) {
-            response.setResidentId(payment.getResident().getId());
-            response.setResidentName(payment.getResident().getFullName());
-        }
-
-        if (payment.getSociety() != null) {
-            response.setSocietyId(payment.getSociety().getId());
-            response.setSocietyName(payment.getSociety().getSocietyName());
-        }
-
-        response.setAmount(payment.getAmount());
-        response.setPaymentMethod(payment.getPaymentMethod());
-        response.setPaymentStatus(payment.getPaymentStatus());
-        response.setPaymentDate(payment.getPaymentDate());
-        response.setTransactionId(payment.getTransactionId());
-        response.setRemarks(payment.getRemarks());
-
-        return response;
+        return builder
+                .amount(payment.getAmount())
+                .paymentMethod(payment.getPaymentMethod())
+                .paymentStatus(payment.getPaymentStatus())
+                .build();
     }
 
 }

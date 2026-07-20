@@ -40,4 +40,5 @@ public interface FlatRepository extends JpaRepository<Flat, Long> {
             FlatOccupancyStatus occupancyStatus
     );
 
+    Optional<Flat> findBySocietyAndFlatNumber(Society society, String flatNumber);
 }

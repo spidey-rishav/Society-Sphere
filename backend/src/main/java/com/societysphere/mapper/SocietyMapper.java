@@ -49,7 +49,7 @@ public final class SocietyMapper {
             response.setSubscriptionPlanName(
                     society.getSubscription()
                            .getSubscriptionPlan()
-                           .getPlanName()
+                           .getName()
             );
         }
 

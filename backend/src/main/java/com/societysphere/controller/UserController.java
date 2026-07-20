@@ -2,7 +2,7 @@ package com.societysphere.controller;
 
 import java.util.List;
 import org.springframework.web.bind.annotation.*;
-import com.societysphere.model.User;
+import com.societysphere.dto.user.UserResponse;
 import com.societysphere.service.UserService;
 
 @RestController
@@ -15,13 +15,8 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public User createUser(@RequestBody User user){
-        return userService.saveUser(user);
-    }
-
     @GetMapping
-    public List<User> getUsers(){
+    public List<UserResponse> getUsers(){
         return userService.getAllUsers();
     }
 }

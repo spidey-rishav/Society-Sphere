@@ -53,6 +53,9 @@ public class User extends BaseEntity {
     @Column(name = "password_changed_at")
     private LocalDateTime passwordChangedAt;
 
+    @Column(name = "first_login", nullable = false)
+    private Boolean firstLogin = true;
+
     @PrePersist
     public void generatePublicId() {
         if (publicId == null) {

@@ -35,7 +35,6 @@ public final class ResidentMapper {
         response.setId(resident.getId());
 
         if (resident.getUser() != null) {
-            response.setUserId(resident.getUser().getId());
             response.setEmail(resident.getUser().getEmail());
         }
 
@@ -43,12 +42,10 @@ public final class ResidentMapper {
         response.setMobileNumber(resident.getMobileNumber());
 
         if (resident.getFlat() != null) {
-
-            response.setFlatId(resident.getFlat().getId());
             response.setFlatNumber(resident.getFlat().getFlatNumber());
+            response.setBlockName(resident.getFlat().getBlock());
 
             if (resident.getFlat().getSociety() != null) {
-                response.setSocietyId(resident.getFlat().getSociety().getId());
                 response.setSocietyName(resident.getFlat().getSociety().getSocietyName());
             }
         }

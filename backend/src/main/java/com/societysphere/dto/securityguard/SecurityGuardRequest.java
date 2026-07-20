@@ -2,7 +2,7 @@ package com.societysphere.dto.securityguard;
 
 import java.time.LocalDate;
 
-import com.societysphere.enums.Shift;
+import com.societysphere.enums.ShiftType;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,7 +23,7 @@ public class SecurityGuardRequest {
     private String employeeId;
 
     @NotNull(message = "Shift is required")
-    private Shift shift;
+    private ShiftType shift;
 
     @NotNull(message = "Joining date is required")
     private LocalDate joiningDate;

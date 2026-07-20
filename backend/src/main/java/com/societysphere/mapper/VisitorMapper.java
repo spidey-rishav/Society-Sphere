@@ -33,43 +33,28 @@ public final class VisitorMapper {
             return null;
         }
 
-        VisitorResponse response = new VisitorResponse();
-
-        response.setId(visitor.getId());
-        response.setPublicId(visitor.getPublicId());
-
-        if (visitor.getSociety() != null) {
-            response.setSocietyId(visitor.getSociety().getId());
-            response.setSocietyName(visitor.getSociety().getSocietyName());
-        }
+        VisitorResponse.VisitorResponseBuilder builder = VisitorResponse.builder()
+                .id(visitor.getId());
 
         if (visitor.getFlat() != null) {
-            response.setFlatId(visitor.getFlat().getId());
-            response.setFlatNumber(visitor.getFlat().getFlatNumber());
+            builder.flatNumber(visitor.getFlat().getFlatNumber());
+            builder.blockName(visitor.getFlat().getBlock());
         }
 
         if (visitor.getSecurityGuard() != null) {
-            response.setSecurityGuardId(visitor.getSecurityGuard().getId());
-            response.setSecurityGuardName(visitor.getSecurityGuard().getFullName());
+            builder.guardName(visitor.getSecurityGuard().getFullName());
         }
 
-        if (visitor.getGuestPreApproval() != null) {
-            response.setGuestPreApprovalId(
-                    visitor.getGuestPreApproval().getId()
-            );
-        }
-
-        response.setVisitorType(visitor.getVisitorType());
-        response.setVisitorName(visitor.getVisitorName());
-        response.setMobileNumber(visitor.getMobileNumber());
-        response.setCompanyName(visitor.getCompanyName());
-        response.setVehicleType(visitor.getVehicleType());
-        response.setVehicleNumber(visitor.getVehicleNumber());
-        response.setVisitorStatus(visitor.getVisitorStatus());
-        response.setEntryTime(visitor.getEntryTime());
-        response.setExitTime(visitor.getExitTime());
-
-        return response;
+        return builder
+                .visitorType(visitor.getVisitorType())
+                .visitorName(visitor.getVisitorName())
+                .companyName(visitor.getCompanyName())
+                .vehicleType(visitor.getVehicleType())
+                .vehicleNumber(visitor.getVehicleNumber())
+                .visitorStatus(visitor.getVisitorStatus())
+                .entryTime(visitor.getEntryTime())
+                .exitTime(visitor.getExitTime())
+                .build();
     }
 
 }

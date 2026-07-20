@@ -1,34 +1,29 @@
 package com.societysphere.dto.securityguard;
 
+import com.societysphere.enums.Gender;
+import com.societysphere.enums.ShiftType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
+import java.util.UUID;
 
-import com.societysphere.enums.Shift;
-
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SecurityGuardResponse {
-
     private Long id;
-
-    private Long userId;
-
+    private UUID publicId;
     private String fullName;
-
     private String email;
-
     private String mobileNumber;
-
-    private Long societyId;
-
-    private String societyName;
-
-    private String employeeId;
-
-    private Shift shift;
-
+    private Gender gender;
+    private ShiftType shiftType;
     private LocalDate joiningDate;
-
+    private String employeeId;
+    private String profileImage;
+    private Boolean active;
 }

@@ -34,17 +34,11 @@ public final class SecurityGuardMapper {
         response.setId(securityGuard.getId());
 
         if (securityGuard.getUser() != null) {
-            response.setUserId(securityGuard.getUser().getId());
             response.setEmail(securityGuard.getUser().getEmail());
         }
 
         response.setFullName(securityGuard.getFullName());
         response.setMobileNumber(securityGuard.getMobileNumber());
-
-        if (securityGuard.getSociety() != null) {
-            response.setSocietyId(securityGuard.getSociety().getId());
-            response.setSocietyName(securityGuard.getSociety().getSocietyName());
-        }
 
         response.setEmployeeId(securityGuard.getEmployeeId());
         response.setJoiningDate(securityGuard.getJoiningDate());

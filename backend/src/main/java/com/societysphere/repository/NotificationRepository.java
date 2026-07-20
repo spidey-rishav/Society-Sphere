@@ -15,21 +15,21 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     List<Notification> findByUser(User user);
 
-    List<Notification> findByNotificationStatus(
-            NotificationStatus notificationStatus
+    List<Notification> findByStatus(
+            NotificationStatus status
     );
 
     List<Notification> findByNotificationType(
             NotificationType notificationType
     );
 
-    List<Notification> findByNotificationPriority(
-            NotificationPriority notificationPriority
+    List<Notification> findByPriority(
+            NotificationPriority priority
     );
 
-    List<Notification> findByUserAndNotificationStatus(
+    List<Notification> findByUserAndStatus(
             User user,
-            NotificationStatus notificationStatus
+            NotificationStatus status
     );
 
     List<Notification> findByUserAndNotificationType(
@@ -39,9 +39,9 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     long countByUser(User user);
 
-    long countByUserAndNotificationStatus(
+    long countByUserAndStatus(
             User user,
-            NotificationStatus notificationStatus
+            NotificationStatus status
     );
 
 }

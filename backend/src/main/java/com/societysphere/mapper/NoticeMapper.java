@@ -35,17 +35,7 @@ public final class NoticeMapper {
 
         NoticeResponse response = new NoticeResponse();
 
-        response.setNoticeId(notice.getNoticeId());
-
-        if (notice.getSociety() != null) {
-            response.setSocietyId(notice.getSociety().getId());
-            response.setSocietyName(notice.getSociety().getSocietyName());
-        }
-
-        if (notice.getAdmin() != null) {
-            response.setAdminId(notice.getAdmin().getId());
-            response.setAdminName(notice.getAdmin().getFullName());
-        }
+        response.setId(notice.getNoticeId());
 
         response.setTitle(notice.getTitle());
         response.setDescription(notice.getDescription());
@@ -55,7 +45,6 @@ public final class NoticeMapper {
         response.setExpiryDate(notice.getExpiryDate());
 
         response.setCreatedAt(notice.getCreatedAt());
-        response.setUpdatedAt(notice.getUpdatedAt());
 
         return response;
     }

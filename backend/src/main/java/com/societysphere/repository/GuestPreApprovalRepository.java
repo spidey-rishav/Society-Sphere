@@ -2,35 +2,30 @@ package com.societysphere.repository;
 
 import com.societysphere.entity.GuestPreApproval;
 import com.societysphere.entity.Resident;
-import com.societysphere.entity.Society;
 import com.societysphere.enums.GuestApprovalStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface GuestPreApprovalRepository extends JpaRepository<GuestPreApproval, Long> {
 
     List<GuestPreApproval> findByResident(Resident resident);
 
-    List<GuestPreApproval> findBySociety(Society society);
+    // GuestPreApproval has no direct 'society' field
+    // Navigate through resident -> flat -> society if needed via @Query
 
-    List<GuestPreApproval> findByApprovalStatus(
-            GuestApprovalStatus approvalStatus
-    );
+    List<GuestPreApproval> findByApprovalStatus(GuestApprovalStatus approvalStatus);
 
-    List<GuestPreApproval> findByResidentAndApprovalStatus(
-            Resident resident,
-            GuestApprovalStatus approvalStatus
-    );
+    List<GuestPreApproval> findByResidentAndApprovalStatus(Resident resident, GuestApprovalStatus approvalStatus);
 
-    List<GuestPreApproval> findByVisitDate(LocalDate visitDate);
+    // GuestPreApproval has 'expectedArrivalTime' not 'visitDate'
+    List<GuestPreApproval> findByExpectedArrivalTimeBetween(LocalDateTime from, LocalDateTime to);
 
-    List<GuestPreApproval> findByResidentAndVisitDate(
-            Resident resident,
-            LocalDate visitDate
-    );
+    Optional<GuestPreApproval> findByBarcode(String barcode);
 
+    boolean existsByBarcode(String barcode);
 }

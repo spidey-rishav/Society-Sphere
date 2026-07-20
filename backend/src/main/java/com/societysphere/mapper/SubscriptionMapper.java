@@ -39,7 +39,7 @@ public final class SubscriptionMapper {
 
         if (subscription.getSubscriptionPlan() != null) {
             response.setSubscriptionPlanId(subscription.getSubscriptionPlan().getId());
-            response.setSubscriptionPlanName(subscription.getSubscriptionPlan().getPlanName());
+            response.setSubscriptionPlanName(subscription.getSubscriptionPlan().getName());
             response.setPrice(subscription.getSubscriptionPlan().getPrice());
         }
 

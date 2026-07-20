@@ -16,7 +16,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 
     Optional<Subscription> findBySociety(Society society);
 
-    List<Subscription> findBySubscriptionStatus(SubscriptionStatus subscriptionStatus);
+    List<Subscription> findByStatus(SubscriptionStatus status);
 
     List<Subscription> findBySubscriptionPlan(SubscriptionPlan subscriptionPlan);
 
@@ -26,8 +26,8 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 
     boolean existsBySociety(Society society);
 
-    List<Subscription> findBySubscriptionStatusAndEndDateBefore(
-        SubscriptionStatus subscriptionStatus,
+    List<Subscription> findByStatusAndEndDateBefore(
+        SubscriptionStatus status,
         LocalDate date
     );
     

@@ -14,20 +14,19 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
     List<Notice> findBySociety(Society society);
 
-    List<Notice> findByNoticeAudience(NoticeAudience noticeAudience);
+    // Notice entity has 'audience' field, not 'noticeAudience'
+    List<Notice> findByAudience(NoticeAudience audience);
 
-    List<Notice> findByNoticePriority(NoticePriority noticePriority);
+    // Notice entity has 'priority' field, not 'noticePriority'
+    List<Notice> findByPriority(NoticePriority priority);
 
-    List<Notice> findBySocietyAndNoticeAudience(
-            Society society,
-            NoticeAudience noticeAudience
-    );
+    List<Notice> findByActive(boolean active);
 
-    List<Notice> findBySocietyAndNoticePriority(
-            Society society,
-            NoticePriority noticePriority
-    );
+    List<Notice> findBySocietyAndAudience(Society society, NoticeAudience audience);
+
+    List<Notice> findBySocietyAndPriority(Society society, NoticePriority priority);
+
+    List<Notice> findBySocietyAndActive(Society society, boolean active);
 
     long countBySociety(Society society);
-
 }

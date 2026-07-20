@@ -11,19 +11,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginResponse {
-
     private String accessToken;
-
     private String tokenType;
-
     private Long userId;
-
     private String fullName;
-
     private String email;
-
     private UserRole role;
-
     private Long societyId;
-
+    private Boolean firstLogin;
 }

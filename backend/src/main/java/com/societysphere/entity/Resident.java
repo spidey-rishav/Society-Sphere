@@ -83,10 +83,6 @@ public class Resident extends BaseEntity {
     @Builder.Default
     private List<GuestPreApproval> guestPreApprovals = new ArrayList<>();
 
-    @OneToMany(mappedBy = "resident")
-    @Builder.Default
-    private List<Notification> notifications = new ArrayList<>();
-
     @PrePersist
     public void generatePublicId() {
         if (publicId == null) {

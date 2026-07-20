@@ -1,32 +1,20 @@
 package com.societysphere.dto.guestpreapproval;
 
-import java.time.LocalDate;
-
 import com.societysphere.enums.GuestApprovalStatus;
+import lombok.Builder;
+import lombok.Data;
 
-import lombok.Getter;
-import lombok.Setter;
+import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
+@Builder
 public class GuestPreApprovalResponse {
-
     private Long id;
-
-    private Long residentId;
-
-    private String residentName;
-
-    private String flatNumber;
-
     private String guestName;
-
     private String guestMobileNumber;
-
-    private LocalDate visitDate;
-
     private String purpose;
-
-    private GuestApprovalStatus status;
-
+    private LocalDateTime expectedArrivalTime;
+    private GuestApprovalStatus approvalStatus;
+    private String barcode;
+    private LocalDateTime barcodeExpiryTime;
 }
