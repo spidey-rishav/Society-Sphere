@@ -17,7 +17,7 @@ const Navbar = () => {
         <Link className='hover:scale-105 transform duration-200 ease-in-out' to="/services">  Services  </Link>
         <Link className='hover:scale-105 transform duration-200 ease-in-out' to="/blog">  Blog  </Link>
         <Link className='hover:scale-105 transform duration-200 ease-in-out' to="/about">    About Us </Link>
-        <Link className='hover:scale-105 transform duration-200 ease-in-out' to="/login">    Login    </Link>
+
       </div>
 
       <button

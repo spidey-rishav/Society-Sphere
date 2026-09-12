@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck, UserPlus, QrCode, ClipboardList,
   AlertCircle, LogOut, Loader2, CheckCircle,
-  Package, X
+  Package, X, Users
 } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../context/AuthContext';
 import useToast from '../../hooks/useToast';
 import {
   addDeliveryVisitor, getAllVisitors, markExit,
@@ -49,8 +49,8 @@ export default function GuardDashboard() {
       const [visRes, compRes] = await Promise.all([
         getAllVisitors(), getGuardComplaints()
       ]);
-      setVisitors(visRes.data || []);
-      setComplaints(compRes.data || []);
+      setVisitors(visRes.data?.data || []);
+      setComplaints(compRes.data?.data || []);
     } catch (e) {
       console.error(e);
     } finally {
@@ -62,7 +62,7 @@ export default function GuardDashboard() {
     setIsLoading(true);
     try {
       const res = await getAllVisitors();
-      setVisitors(res.data || []);
+      setVisitors(res.data?.data || []);
     } catch (e) { showToast('Error fetching visitors', 'error'); } finally { setIsLoading(false); }
   };
 
@@ -70,7 +70,7 @@ export default function GuardDashboard() {
     setIsLoading(true);
     try {
       const res = await getGuardComplaints();
-      setComplaints(res.data || []);
+      setComplaints(res.data?.data || []);
     } catch (e) { showToast('Error fetching complaints', 'error'); } finally { setIsLoading(false); }
   };
 

@@ -3,7 +3,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/landing/Landing';
 import LoginPage from './pages/auth/LoginPage';
 import FirstLoginPage from './pages/auth/FirstLoginPage';
+import SuperAdminLogin from './pages/auth/SuperAdminLogin';
+import RegisterSociety from './pages/auth/RegisterSociety';
 import SocietySelectionPage from './pages/SocietySelectionPage';
+import SuperAdminDashboard from './pages/superadmin/SuperAdminDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ResidentDashboard from './pages/resident/ResidentDashboard';
 import GuardDashboard from './pages/securityguard/GuardDashboard';
@@ -16,12 +19,24 @@ function App() {
       <Routes>
         <Route index element={<LandingPage />} />
         <Route path="/society" element={<SocietySelectionPage />} />
+        <Route path="/register-society" element={<RegisterSociety />} />
+        <Route path="/super-admin-login" element={<SuperAdminLogin />} />
         <Route path="/login" element={<LoginPage />} />
         <Route
           path="/first-login"
           element={
             <ProtectedRoute>
               <FirstLoginPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* Dashboards */}
+        <Route
+          path="/super-admin"
+          element={
+            <ProtectedRoute requiredRole="SUPER_ADMIN">
+              <SuperAdminDashboard />
             </ProtectedRoute>
           }
         />

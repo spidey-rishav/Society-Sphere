@@ -7,14 +7,18 @@ import Rotation from '../../components/landing/Rotation'
 import Unique from '../../components/landing/Unique'
 import FAQ from '../../components/landing/FAQ'
 import Footer from '../../components/landing/Footer'
+import About from '../../components/landing/About'
+import Features from '../../components/landing/Features'
+import Contact from '../../components/landing/Contact'
 
 const Landing = () => {
   return (
     <>
         <Navbar/>
         <Intro/>
-        <Detail/>
-        <Rotation/>
+        <About/>
+        <Features/>
+        <Contact/>
         <Unique/>
         <SocialMedia/>
         <FAQ/>

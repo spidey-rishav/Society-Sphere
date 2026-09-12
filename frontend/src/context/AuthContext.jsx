@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
       );
       return JSON.parse(jsonPayload);
     } catch (e) {
-      return null;
+      return e;
     }
   };
 
@@ -54,6 +54,7 @@ export const AuthProvider = ({ children }) => {
           setUser(JSON.parse(storedUser));
         } catch (e) {
           setUser(parseJwt(token));
+          return e;
         }
       } else {
         setUser(parseJwt(token));

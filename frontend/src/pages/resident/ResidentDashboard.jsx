@@ -4,7 +4,7 @@ import {
   Bell, AlertCircle, Clock, CheckCircle,
   Plus, X, LogOut, Loader2, QrCode
 } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../context/AuthContext';
 import useToast from '../../hooks/useToast';
 import {
   getMyComplaints, createComplaint,
@@ -66,9 +66,9 @@ export default function ResidentDashboard() {
       const [compRes, notRes, payRes] = await Promise.all([
         getMyComplaints(), getMyNotices(), getMyPayments()
       ]);
-      setComplaints(compRes.data || []);
-      setNotices(notRes.data || []);
-      setPayments(payRes.data || []);
+      setComplaints(compRes.data?.data || []);
+      setNotices(notRes.data?.data || []);
+      setPayments(payRes.data?.data || []);
     } catch (e) {
       console.error(e);
     } finally {
@@ -80,7 +80,7 @@ export default function ResidentDashboard() {
     setIsLoading(true);
     try {
       const res = await getMyComplaints();
-      setComplaints(res.data || []);
+      setComplaints(res.data?.data || []);
     } catch (e) { showToast('Error fetching complaints', 'error'); } finally { setIsLoading(false); }
   };
 
@@ -88,7 +88,7 @@ export default function ResidentDashboard() {
     setIsLoading(true);
     try {
       const res = await getMyVisitors();
-      setVisitors(res.data || []);
+      setVisitors(res.data?.data || []);
     } catch (e) { showToast('Error fetching visitors', 'error'); } finally { setIsLoading(false); }
   };
 
@@ -96,7 +96,7 @@ export default function ResidentDashboard() {
     setIsLoading(true);
     try {
       const res = await getMyGuestPreApprovals();
-      setPreApprovals(res.data || []);
+      setPreApprovals(res.data?.data || []);
     } catch (e) { showToast('Error fetching pre-approvals', 'error'); } finally { setIsLoading(false); }
   };
 
@@ -104,7 +104,7 @@ export default function ResidentDashboard() {
     setIsLoading(true);
     try {
       const res = await getMyNotices();
-      setNotices(res.data || []);
+      setNotices(res.data?.data || []);
     } catch (e) { showToast('Error fetching notices', 'error'); } finally { setIsLoading(false); }
   };
 
@@ -112,7 +112,7 @@ export default function ResidentDashboard() {
     setIsLoading(true);
     try {
       const res = await getMyPayments();
-      setPayments(res.data || []);
+      setPayments(res.data?.data || []);
     } catch (e) { showToast('Error fetching payments', 'error'); } finally { setIsLoading(false); }
   };
 

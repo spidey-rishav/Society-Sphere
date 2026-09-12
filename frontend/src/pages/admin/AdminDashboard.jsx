@@ -4,17 +4,17 @@ import {
   ClipboardList, CheckCircle, Clock, XCircle,
   Bell, FileText, Search, Plus, Filter,
   MoreVertical, X, Calendar, Activity,
-  ChevronRight, CheckSquare, LogOut, Loader2
+  ChevronRight, CheckSquare, LogOut, Loader2, AlertCircle
 } from 'lucide-react';
-import { useAuth } from '../../../hooks/useAuth';
-import useToast from '../../../hooks/useToast';
+import { useAuth } from '../../context/AuthContext';
+import useToast from '../../hooks/useToast';
 import {
   getResidents, createResident, deleteResident,
   getGuards, createGuard, deleteGuard,
   getNotices, createNotice, deleteNotice,
   getResidentComplaints, getGuardComplaints, updateComplaint,
   getAllVisitors
-} from '../../../services/adminService';
+} from '../../services/adminService';
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
@@ -70,10 +70,10 @@ export default function AdminDashboard() {
         getResidents(), getGuards(), getResidentComplaints(), getAllVisitors()
       ]);
       setStats({
-        residents: resData.data.length || 0,
-        guards: guardData.data.length || 0,
-        complaints: compData.data.filter(c => c.status === 'PENDING').length || 0,
-        visitors: visData.data.filter(v => new Date(v.entryTime).toDateString() === new Date().toDateString()).length || 0
+        residents: resData.data?.data?.length || 0,
+        guards: guardData.data?.data?.length || 0,
+        complaints: compData.data?.data?.filter(c => c.status === 'PENDING').length || 0,
+        visitors: visData.data?.data?.filter(v => new Date(v.entryTime).toDateString() === new Date().toDateString()).length || 0
       });
     } catch (error) {
       console.error(error);
@@ -86,9 +86,9 @@ export default function AdminDashboard() {
     setIsLoading(true);
     try {
       const res = await getResidents();
-      setResidents(res.data || []);
+      setResidents(res.data?.data || []);
     } catch (error) {
-      showToast('Failed to fetch residents', 'error');
+      showToast('Failed to fetch residents', error);
     } finally {
       setIsLoading(false);
     }
@@ -98,9 +98,9 @@ export default function AdminDashboard() {
     setIsLoading(true);
     try {
       const res = await getGuards();
-      setGuards(res.data || []);
+      setGuards(res.data?.data || []);
     } catch (error) {
-      showToast('Failed to fetch guards', 'error');
+      showToast('Failed to fetch guards', error);
     } finally {
       setIsLoading(false);
     }
@@ -111,9 +111,9 @@ export default function AdminDashboard() {
     try {
       // Merging resident and guard complaints for admin
       const [rComp, gComp] = await Promise.all([getResidentComplaints(), getGuardComplaints()]);
-      setComplaints([...(rComp.data || []), ...(gComp.data || [])]);
+      setComplaints([...(rComp.data?.data || []), ...(gComp.data?.data || [])]);
     } catch (error) {
-      showToast('Failed to fetch complaints', 'error');
+      showToast('Failed to fetch complaints', error);
     } finally {
       setIsLoading(false);
     }
@@ -123,9 +123,9 @@ export default function AdminDashboard() {
     setIsLoading(true);
     try {
       const res = await getAllVisitors();
-      setVisitors(res.data || []);
+      setVisitors(res.data?.data || []);
     } catch (error) {
-      showToast('Failed to fetch visitors', 'error');
+      showToast('Failed to fetch visitors', error);
     } finally {
       setIsLoading(false);
     }
@@ -135,9 +135,9 @@ export default function AdminDashboard() {
     setIsLoading(true);
     try {
       const res = await getNotices();
-      setNotices(res.data || []);
+      setNotices(res.data?.data || []);
     } catch (error) {
-      showToast('Failed to fetch notices', 'error');
+      showToast('Failed to fetch notices', error);
     } finally {
       setIsLoading(false);
     }
@@ -152,7 +152,7 @@ export default function AdminDashboard() {
       setResidentModalOpen(false);
       fetchResidents();
     } catch (error) {
-      showToast('Error adding resident', 'error');
+      showToast('Error adding resident', error);
     }
   };
 
@@ -164,7 +164,7 @@ export default function AdminDashboard() {
       setGuardModalOpen(false);
       fetchGuards();
     } catch (error) {
-      showToast('Error adding guard', 'error');
+      showToast('Error adding guard', error);
     }
   };
 
@@ -176,7 +176,7 @@ export default function AdminDashboard() {
       setNoticeModalOpen(false);
       fetchNotices();
     } catch (error) {
-      showToast('Error creating notice', 'error');
+      showToast('Error creating notice', error);
     }
   };
 
@@ -188,7 +188,7 @@ export default function AdminDashboard() {
       setComplaintModalData(null);
       fetchComplaints();
     } catch (error) {
-      showToast('Error updating complaint', 'error');
+      showToast('Error updating complaint', error);
     }
   };
 
