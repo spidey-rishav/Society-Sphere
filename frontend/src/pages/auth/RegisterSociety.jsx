@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import api from '../../services/api';
 
 const RegisterSociety = () => {
   const navigate = useNavigate();
@@ -19,10 +20,13 @@ const RegisterSociety = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // TODO: Connect to backend for Society Registration
-    console.log('Society Registration', formData);
+  const [message, setMessage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const handleSubmit = async (e) => {
+    e.preventDefault(); setSubmitting(true); setMessage('');
+    try { const response = await api.post('/api/societies/registration-request', { ...formData, adminMobile: formData.adminPhone }); navigate('/registration-submitted', { state: { societyCode: response.data?.data?.societyCode } }); }
+    catch (err) { setMessage(err.response?.data?.message || 'Could not submit the registration request.'); }
+    finally { setSubmitting(false); }
   };
 
   return (
@@ -146,7 +150,7 @@ const RegisterSociety = () => {
                 type="submit"
                 className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl px-4 py-4 transition-all shadow-lg shadow-emerald-600/30"
               >
-                Submit Registration Request
+                {submitting ? 'Submitting...' : 'Submit Registration Request'}
               </button>
             </div>
             

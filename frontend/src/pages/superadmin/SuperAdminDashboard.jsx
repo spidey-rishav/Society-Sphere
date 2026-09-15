@@ -6,7 +6,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import useToast from '../../hooks/useToast';
 
-import { getPlatformStats, getSocieties, updateSocietyStatus } from '../../services/superAdminService';
+import { getPlatformStats, getSocieties, updateSocietyStatus, resendSocietyCredentials } from '../../services/superAdminService';
 
 export default function SuperAdminDashboard() {
   const { user, logout } = useAuth();
@@ -17,6 +17,7 @@ export default function SuperAdminDashboard() {
   // Data states
   const [stats, setStats] = useState({ totalSocieties: 0, totalUsers: 0, activeSocieties: 0, pendingRequests: 0 });
   const [societies, setSocieties] = useState([]);
+  const [selectedSociety, setSelectedSociety] = useState(null);
 
   useEffect(() => {
     if (activeTab === 'dashboard') fetchStats();
@@ -51,21 +52,48 @@ export default function SuperAdminDashboard() {
     try {
       await updateSocietyStatus(id, true);
       showToast(`Society ${id} approved successfully`, 'success');
-      setSocieties(societies.map(s => s.id === id ? { ...s, status: 'ACTIVE' } : s));
-    } catch (e) { showToast('Error approving society', 'error'); }
+      setSelectedSociety(null); await fetchSocieties(); await fetchStats();
+    } catch (e) { showToast(e.response?.data?.message || 'Error approving society', 'error'); }
   };
 
+  const handleResendCredentials = async (id) => {
+    try {
+      const response = await resendSocietyCredentials(id);
+      showToast(response.data?.message || 'Credentials processed', 'success');
+    } catch (e) {
+      showToast(e.response?.data?.message || 'Could not resend credentials', 'error');
+    }
+  };
   const handleRejectSociety = async (id) => {
     try {
       await updateSocietyStatus(id, false);
       showToast(`Society ${id} rejected`, 'info');
-      setSocieties(societies.map(s => s.id === id ? { ...s, status: 'REJECTED' } : s));
-    } catch (e) { showToast('Error rejecting society', 'error'); }
+      setSelectedSociety(null); await fetchSocieties(); await fetchStats();
+    } catch (e) { showToast(e.response?.data?.message || 'Error rejecting society', 'error'); }
   };
 
   return (
     <div className="flex h-screen bg-gray-950 text-white font-sans overflow-hidden">
       {ToastComponent}
+      {selectedSociety && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <section className="w-full max-w-2xl rounded-2xl border border-gray-700 bg-gray-900 p-6 shadow-2xl">
+            <div className="mb-6 flex items-start justify-between">
+              <div><h3 className="text-xl font-bold">{selectedSociety.status === 'PENDING' ? 'Registration details' : 'Society details'}</h3><p className="text-sm text-gray-400">{selectedSociety.status === 'PENDING' ? 'Review before approving or rejecting.' : 'Review the approved society and its administrator.'}</p></div>
+              <button onClick={() => setSelectedSociety(null)} className="text-gray-400 hover:text-white">Close</button>
+            </div>
+            <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
+              <p><span className="text-gray-400">Society:</span> {selectedSociety.name}</p>
+              <p><span className="text-gray-400">Registration no.:</span> {selectedSociety.registrationNumber}</p>
+              <p className="md:col-span-2"><span className="text-gray-400">Address:</span> {selectedSociety.address}, {selectedSociety.city}, {selectedSociety.state} {selectedSociety.pincode}</p>
+              <p><span className="text-gray-400">Administrator:</span> {selectedSociety.adminName}</p>
+              <p><span className="text-gray-400">Email:</span> {selectedSociety.adminEmail}</p>
+              <p><span className="text-gray-400">Phone:</span> {selectedSociety.adminPhone}</p>
+            </div>
+            {selectedSociety.status === 'PENDING' && <div className="mt-8 flex justify-end gap-3"><button onClick={() => handleRejectSociety(selectedSociety.id)} className="rounded-lg bg-gray-700 px-4 py-2 text-sm hover:bg-gray-600">Reject</button><button onClick={() => handleApproveSociety(selectedSociety.id)} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold hover:bg-emerald-500">Approve</button></div>}            {['ACTIVE', 'APPROVED'].includes(selectedSociety.status) && <div className="mt-8 flex justify-end"><button onClick={() => handleResendCredentials(selectedSociety.id)} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold hover:bg-indigo-500">Resend credentials</button></div>}
+          </section>
+        </div>
+      )}
 
       {/* Sidebar */}
       <aside className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col justify-between hidden md:flex">
@@ -201,7 +229,7 @@ export default function SuperAdminDashboard() {
                             <td className="p-4">{s.users}</td>
                             <td className="p-4">
                               <span className={`px-2 py-1 text-xs rounded-lg border ${
-                                s.status === 'ACTIVE' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 
+                                ['ACTIVE', 'APPROVED'].includes(s.status) ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 
                                 s.status === 'PENDING' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50' : 
                                 'bg-red-500/20 text-red-400 border-red-500/50'}`}>
                                 {s.status}
@@ -210,12 +238,13 @@ export default function SuperAdminDashboard() {
                             <td className="p-4 text-right">
                               {s.status === 'PENDING' && (
                                 <div className="flex justify-end space-x-2">
+                                  <button onClick={() => setSelectedSociety(s)} className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded-lg text-sm transition-colors">View details</button>
                                   <button onClick={() => handleApproveSociety(s.id)} className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-lg text-sm transition-colors">Approve</button>
                                   <button onClick={() => handleRejectSociety(s.id)} className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded-lg text-sm transition-colors">Reject</button>
                                 </div>
                               )}
-                              {s.status === 'ACTIVE' && (
-                                <button className="text-gray-500 hover:text-white transition-colors text-sm">Manage</button>
+                              {['ACTIVE', 'APPROVED'].includes(s.status) && (
+                                <button onClick={() => setSelectedSociety(s)} className="rounded-lg bg-indigo-600 px-3 py-1 text-sm text-white transition-colors hover:bg-indigo-500">Manage</button>
                               )}
                             </td>
                           </tr>

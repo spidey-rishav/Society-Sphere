@@ -35,7 +35,7 @@ const FirstLoginPage = () => {
     
     setLoading(true);
     try {
-      const response = await completeProfileService({ ...formData, userId: user?.id });
+      const response = await completeProfileService({ ...formData, emergencyContactNumber: formData.emergencyContactPhone, alternateMobileNumber: formData.alternatePhone });
       // Update local storage and context to set firstLogin = false
       const updatedUser = { ...user, firstLogin: false, ...response.data };
       const token = localStorage.getItem('token');

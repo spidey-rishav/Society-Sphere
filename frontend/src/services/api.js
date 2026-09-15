@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080',
+  // Vite forwards /api requests to the backend during development. Keeping
+  // requests same-origin prevents browser extensions from blocking localhost:8080.
+  baseURL: '',
 });
 
 api.interceptors.request.use((config) => {

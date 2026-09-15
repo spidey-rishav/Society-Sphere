@@ -5,6 +5,7 @@ import LoginPage from './pages/auth/LoginPage';
 import FirstLoginPage from './pages/auth/FirstLoginPage';
 import SuperAdminLogin from './pages/auth/SuperAdminLogin';
 import RegisterSociety from './pages/auth/RegisterSociety';
+import RegistrationSubmitted from './pages/auth/RegistrationSubmitted';
 import SocietySelectionPage from './pages/SocietySelectionPage';
 import SuperAdminDashboard from './pages/superadmin/SuperAdminDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -20,6 +21,7 @@ function App() {
         <Route index element={<LandingPage />} />
         <Route path="/society" element={<SocietySelectionPage />} />
         <Route path="/register-society" element={<RegisterSociety />} />
+        <Route path="/registration-submitted" element={<RegistrationSubmitted />} />
         <Route path="/super-admin-login" element={<SuperAdminLogin />} />
         <Route path="/login" element={<LoginPage />} />
         <Route

@@ -8,6 +8,7 @@ const SuperAdminLogin = () => {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -82,13 +83,20 @@ const SuperAdminLogin = () => {
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-2">Password</label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-red-500 outline-none transition-all"
                 placeholder="••••••••"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((visible) => !visible)}
+                className="mt-2 text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                {showPassword ? 'Hide password' : 'Show password'}
+              </button>
             </div>
 
             {error && (
