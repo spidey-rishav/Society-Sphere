@@ -12,16 +12,13 @@ public class SocietyRegistrationRequest {
     @NotBlank(message = "Society name is required")
     private String societyName;
 
+    @NotBlank(message = "Registration number is required")
+    private String registrationNumber;
+
     @NotBlank(message = "Address is required")
     private String address;
-
-    @NotBlank(message = "City is required")
     private String city;
-
-    @NotBlank(message = "State is required")
     private String state;
-
-    @NotBlank(message = "Pincode is required")
     private String pincode;
 
     @NotBlank(message = "Admin name is required")

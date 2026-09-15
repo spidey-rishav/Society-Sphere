@@ -11,6 +11,8 @@ import com.societysphere.service.ComplaintService;
 import com.societysphere.service.FeedbackService;
 import com.societysphere.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,18 +26,17 @@ public class ComplaintController {
     private final PaymentService paymentService;
     private final FeedbackService feedbackService;
 
-    // TODO: Extract userEmail from authenticated user context, passing placeholder for now
-
     @PostMapping("/complaints")
-    public ApiResponse<ComplaintResponse> raiseComplaint(@RequestBody CreateComplaintRequest request) {
-        String userEmail = "test@example.com"; // Placeholder
-        return complaintService.raiseComplaint(request, userEmail);
+    public ApiResponse<ComplaintResponse> raiseComplaint(
+            @RequestBody CreateComplaintRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return complaintService.raiseComplaint(request, userDetails.getUsername());
     }
 
     @GetMapping("/complaints/my")
-    public ApiResponse<List<ComplaintResponse>> getMyComplaints() {
-        String userEmail = "test@example.com"; // Placeholder
-        return complaintService.getMyComplaints(userEmail);
+    public ApiResponse<List<ComplaintResponse>> getMyComplaints(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return complaintService.getMyComplaints(userDetails.getUsername());
     }
 
     @GetMapping("/complaints/residents")
@@ -51,19 +52,23 @@ public class ComplaintController {
     }
 
     @PutMapping("/complaints/{id}")
-    public ApiResponse<ComplaintResponse> updateComplaint(@PathVariable("id") Long id, @RequestBody UpdateComplaintRequest request) {
+    public ApiResponse<ComplaintResponse> updateComplaint(
+            @PathVariable("id") Long id,
+            @RequestBody UpdateComplaintRequest request) {
         return complaintService.updateComplaint(id, request);
     }
 
     @PostMapping("/payments")
-    public ApiResponse<PaymentResponse> processPayment(@RequestBody CreatePaymentRequest request) {
-        String userEmail = "test@example.com"; // Placeholder
-        return paymentService.processPayment(request, userEmail);
+    public ApiResponse<PaymentResponse> processPayment(
+            @RequestBody CreatePaymentRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return paymentService.processPayment(request, userDetails.getUsername());
     }
 
     @PostMapping("/feedback")
-    public ApiResponse<String> submitFeedback(@RequestBody CreateFeedbackRequest request) {
-        String userEmail = "test@example.com"; // Placeholder
-        return feedbackService.submitFeedback(request, userEmail);
+    public ApiResponse<String> submitFeedback(
+            @RequestBody CreateFeedbackRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return feedbackService.submitFeedback(request, userDetails.getUsername());
     }
 }

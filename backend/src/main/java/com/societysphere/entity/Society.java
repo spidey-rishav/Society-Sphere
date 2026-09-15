@@ -1,5 +1,6 @@
 package com.societysphere.entity;
 
+import com.societysphere.enums.RegistrationStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -71,6 +72,13 @@ public class Society extends BaseEntity {
 
     @Column(nullable = false)
     private Boolean active = true;
+
+    @Column(name = "applicant_admin_name")
+    private String applicantAdminName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "registration_status")
+    private RegistrationStatus registrationStatus;
 
     @OneToOne(mappedBy = "society")
     private Subscription subscription;

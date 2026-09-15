@@ -39,12 +39,14 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/api/auth/**",
+                    "/api/societies/registration-request",
                     "/api/guest/**",
                     "/api/societies/search",
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/api-docs/**"
                 ).permitAll()
+                .requestMatchers("/api/superadmin/**").hasRole("SUPER_ADMIN")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
