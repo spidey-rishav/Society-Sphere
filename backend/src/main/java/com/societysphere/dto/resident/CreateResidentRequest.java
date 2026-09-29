@@ -29,6 +29,8 @@ public class CreateResidentRequest {
     @NotNull(message = "Flat ID is required")
     private Long flatId;
 
+    private String flatNumber;
+
     @NotBlank(message = "Mobile number is required")
     @Pattern(regexp = "^\\d{10}$", message = "Mobile number must be 10 digits")
     private String mobileNumber;

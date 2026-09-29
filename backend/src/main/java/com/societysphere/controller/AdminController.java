@@ -2,13 +2,20 @@ package com.societysphere.controller;
 
 import com.societysphere.dto.notice.CreateNoticeRequest;
 import com.societysphere.dto.notice.NoticeResponse;
+import com.societysphere.dto.flat.FlatResponse;
+import com.societysphere.dto.flat.CreateAdminFlatRequest;
 import com.societysphere.dto.resident.CreateResidentRequest;
 import com.societysphere.dto.resident.ResidentResponse;
 import com.societysphere.dto.securityguard.CreateSecurityGuardRequest;
 import com.societysphere.dto.securityguard.SecurityGuardResponse;
 import com.societysphere.entity.Admin;
+import com.societysphere.entity.Flat;
 import com.societysphere.entity.User;
+import com.societysphere.enums.FlatOccupancyStatus;
+import com.societysphere.exception.BadRequestException;
+import com.societysphere.mapper.FlatMapper;
 import com.societysphere.repository.AdminRepository;
+import com.societysphere.repository.FlatRepository;
 import com.societysphere.repository.UserRepository;
 import com.societysphere.response.ApiResponse;
 import com.societysphere.service.AdminService;
@@ -33,6 +40,7 @@ public class AdminController {
     private final NoticeService noticeService;
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
+    private final FlatRepository flatRepository;
 
     private Admin getAuthenticatedAdmin(UserDetails userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername())
@@ -41,6 +49,36 @@ public class AdminController {
                 .filter(a -> a.getUser().getId().equals(user.getId()))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Admin not found"));
+    }
+
+    @GetMapping("/flats")
+    public ResponseEntity<ApiResponse<List<FlatResponse>>> getFlatsForAuthenticatedAdmin(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Admin admin = getAuthenticatedAdmin(userDetails);
+        List<FlatResponse> flats = flatRepository.findBySociety(admin.getSociety()).stream()
+                .filter(flat -> Boolean.TRUE.equals(flat.getActive()))
+                .map(FlatMapper::toResponse)
+                .toList();
+        return ResponseEntity.ok(ApiResponse.success("Flats fetched successfully", flats));
+    }
+
+    @PostMapping("/flats")
+    public ResponseEntity<ApiResponse<FlatResponse>> createFlat(
+            @Valid @RequestBody CreateAdminFlatRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Admin admin = getAuthenticatedAdmin(userDetails);
+        if (flatRepository.existsByFlatNumberAndSociety(request.getFlatNumber().trim(), admin.getSociety())) {
+            throw new BadRequestException("This flat number already exists in your society");
+        }
+        Flat flat = Flat.builder()
+                .society(admin.getSociety())
+                .flatNumber(request.getFlatNumber().trim())
+                .block(request.getBlockName().trim())
+                .floorNumber(request.getFloorNumber())
+                .occupancyStatus(FlatOccupancyStatus.VACANT)
+                .active(true)
+                .build();
+        return ResponseEntity.ok(ApiResponse.success("Flat created successfully", FlatMapper.toResponse(flatRepository.save(flat))));
     }
 
     @PostMapping("/residents")

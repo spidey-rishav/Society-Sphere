@@ -7,12 +7,18 @@ import com.societysphere.dto.securityguard.SecurityGuardResponse;
 import com.societysphere.entity.*;
 import com.societysphere.enums.AccountStatus;
 import com.societysphere.enums.UserRole;
+import com.societysphere.enums.FlatOccupancyStatus;
+import com.societysphere.exception.BadRequestException;
 import com.societysphere.repository.*;
 import com.societysphere.response.ApiResponse;
 import com.societysphere.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +37,10 @@ public class AdminServiceImpl implements AdminService {
     private final FlatRepository flatRepository;
     private final SocietyRepository societyRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JavaMailSender mail;
+
+    @Value("${app.mail.enabled:false}") private boolean mailEnabled;
+    @Value("${spring.mail.username:}") private String senderEmail;
 
     private String generateTempPassword() {
         return UUID.randomUUID().toString().substring(0, 8);
@@ -39,6 +49,10 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional
     public ApiResponse<ResidentResponse> createResident(CreateResidentRequest request, Long societyId) {
+        String email = request.getEmail().trim().toLowerCase();
+        if (userRepository.existsByEmail(email)) {
+            throw new BadRequestException("This email is already registered. Use a different email address for the resident.");
+        }
         Flat flat = flatRepository.findById(request.getFlatId())
                 .orElseThrow(() -> new RuntimeException("Flat not found"));
 
@@ -50,7 +64,7 @@ public class AdminServiceImpl implements AdminService {
         log.info("Temporary password for new resident {}: {}", request.getEmail(), tempPassword);
 
         User user = User.builder()
-                .email(request.getEmail())
+                .email(email)
                 .password(passwordEncoder.encode(tempPassword))
                 .role(UserRole.RESIDENT)
                 .accountStatus(AccountStatus.ACTIVE)
@@ -74,7 +88,7 @@ public class AdminServiceImpl implements AdminService {
                 .build();
         resident = residentRepository.save(resident);
 
-        return ApiResponse.success("Resident created successfully", mapToResponse(resident));
+        return ApiResponse.success(sendCredentials(user, tempPassword, "resident") ? "Resident created and credentials emailed" : "Resident created, but credential email was not sent", mapToResponse(resident));
     }
 
     @Override
@@ -118,12 +132,17 @@ public class AdminServiceImpl implements AdminService {
                 .orElseThrow(() -> new RuntimeException("Resident not found"));
         resident.setActive(false);
         residentRepository.save(resident);
-        return ApiResponse.success("Resident deleted successfully", null);
+        releaseUserEmail(resident.getUser());
+        return ApiResponse.success("Resident deleted and email released for reuse", null);
     }
 
     @Override
     @Transactional
     public ApiResponse<SecurityGuardResponse> createSecurityGuard(CreateSecurityGuardRequest request, Long societyId) {
+        String email = request.getEmail().trim().toLowerCase();
+        if (userRepository.existsByEmail(email)) {
+            throw new BadRequestException("This email is already registered. Use a different email address for the security guard.");
+        }
         Society society = societyRepository.findById(societyId)
                 .orElseThrow(() -> new RuntimeException("Society not found"));
 
@@ -131,7 +150,7 @@ public class AdminServiceImpl implements AdminService {
         log.info("Temporary password for new security guard {}: {}", request.getEmail(), tempPassword);
 
         User user = User.builder()
-                .email(request.getEmail())
+                .email(email)
                 .password(passwordEncoder.encode(tempPassword))
                 .role(UserRole.SECURITY_GUARD)
                 .accountStatus(AccountStatus.ACTIVE)
@@ -148,12 +167,12 @@ public class AdminServiceImpl implements AdminService {
                 .gender(request.getGender())
                 .shiftType(request.getShiftType())
                 .joiningDate(request.getJoiningDate())
-                .employeeId(request.getEmployeeId())
+                .employeeId(generateEmployeeId(society))
                 .active(true)
                 .build();
         guard = securityGuardRepository.save(guard);
 
-        return ApiResponse.success("Security Guard created successfully", mapToResponse(guard));
+        return ApiResponse.success(sendCredentials(user, tempPassword, "security guard") ? "Security guard created and credentials emailed" : "Security guard created, but credential email was not sent", mapToResponse(guard));
     }
 
     @Override
@@ -189,9 +208,30 @@ public class AdminServiceImpl implements AdminService {
                 .orElseThrow(() -> new RuntimeException("Security Guard not found"));
         guard.setActive(false);
         securityGuardRepository.save(guard);
-        return ApiResponse.success("Security Guard deleted successfully", null);
+        releaseUserEmail(guard.getUser());
+        return ApiResponse.success("Security guard deleted and email released for reuse", null);
     }
 
+    private void releaseUserEmail(User user) {
+        String originalEmail = user.getEmail();
+        user.setAccountStatus(AccountStatus.INACTIVE);
+        user.setEmail("deleted-" + user.getId() + "-" + UUID.randomUUID().toString().substring(0, 8) + "@societysphere.invalid");
+        userRepository.save(user);
+        log.info("Released login email {} for deleted account {}", originalEmail, user.getId());
+    }
+    private String generateEmployeeId(Society society) {
+        String prefix = "GRD-" + society.getId() + "-";
+        long sequence = securityGuardRepository.countBySociety(society) + 1;
+        String employeeId;
+        do { employeeId = prefix + String.format("%04d", sequence++); }
+        while (securityGuardRepository.existsByEmployeeId(employeeId));
+        return employeeId;
+    }
+    private boolean sendCredentials(User user, String password, String role) {
+        if (!mailEnabled || senderEmail == null || senderEmail.isBlank()) return false;
+        try { SimpleMailMessage message = new SimpleMailMessage(); message.setFrom(senderEmail); message.setTo(user.getEmail()); message.setSubject("Society Sphere " + role + " credentials"); message.setText("Your Society Sphere account is ready.\n\nLogin email: " + user.getEmail() + "\nTemporary password: " + password + "\n\nPlease sign in and complete your profile."); mail.send(message); return true; }
+        catch (MailException ex) { log.warn("Could not email {} credentials: {}", role, ex.getMessage()); return false; }
+    }
     private ResidentResponse mapToResponse(Resident resident) {
         return ResidentResponse.builder()
                 .id(resident.getId())

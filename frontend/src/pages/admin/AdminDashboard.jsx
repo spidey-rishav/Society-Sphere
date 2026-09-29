@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import {
   Users, UserPlus, Shield, ShieldAlert,
   ClipboardList, CheckCircle, Clock, XCircle,
-  Bell, FileText, Search, Plus, Filter,
+  Bell, Building2, FileText, Search, Plus, Filter,
   MoreVertical, X, Calendar, Activity,
   ChevronRight, CheckSquare, LogOut, Loader2, AlertCircle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import useToast from '../../hooks/useToast';
 import {
-  getResidents, createResident, deleteResident,
+  getFlats, createFlat, getResidents, createResident, deleteResident,
   getGuards, createGuard, deleteGuard,
   getNotices, createNotice, deleteNotice,
   getResidentComplaints, getGuardComplaints, updateComplaint,
@@ -25,6 +25,8 @@ export default function AdminDashboard() {
 
   // Data states
   const [residents, setResidents] = useState([]);
+  const [flats, setFlats] = useState([]);
+  const [isLoadingFlats, setIsLoadingFlats] = useState(false);
   const [guards, setGuards] = useState([]);
   const [complaints, setComplaints] = useState([]);
   const [visitors, setVisitors] = useState([]);
@@ -32,16 +34,18 @@ export default function AdminDashboard() {
 
   // Modals state
   const [isResidentModalOpen, setResidentModalOpen] = useState(false);
+  const [isFlatModalOpen, setFlatModalOpen] = useState(false);
   const [isGuardModalOpen, setGuardModalOpen] = useState(false);
   const [isNoticeModalOpen, setNoticeModalOpen] = useState(false);
   const [complaintModalData, setComplaintModalData] = useState(null);
 
   // Forms state
   const [residentForm, setResidentForm] = useState({
-    name: '', email: '', flatNumber: '', mobileNumber: '', gender: 'MALE', residentType: 'OWNER'
+    name: '', email: '', flatId: '', mobileNumber: '', gender: 'MALE', residentType: 'OWNER'
   });
+  const [flatForm, setFlatForm] = useState({ flatNumber: '', blockName: '', floorNumber: '' });
   const [guardForm, setGuardForm] = useState({
-    name: '', email: '', mobileNumber: '', gender: 'MALE', shiftType: 'MORNING', employeeId: '', joiningDate: ''
+    name: '', email: '', mobileNumber: '', gender: 'MALE', shiftType: 'MORNING', joiningDate: ''
   });
   const [noticeForm, setNoticeForm] = useState({
     title: '', description: '', audience: 'ALL', priority: 'LOW'
@@ -56,6 +60,7 @@ export default function AdminDashboard() {
   // Fetch data based on active tab
   useEffect(() => {
     if (activeTab === 'dashboard') fetchStats();
+    if (activeTab === 'flats') fetchFlats();
     if (activeTab === 'residents') fetchResidents();
     if (activeTab === 'guards') fetchGuards();
     if (activeTab === 'complaints') fetchComplaints();
@@ -91,6 +96,45 @@ export default function AdminDashboard() {
       showToast('Failed to fetch residents', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const openResidentModal = async () => {
+    setResidentModalOpen(true);
+    setIsLoadingFlats(true);
+    try {
+      const response = await getFlats();
+      setFlats((response.data?.data || []).filter(flat => !flat.isOccupied));
+    } catch (error) {
+      setFlats([]);
+      showToast('Unable to load flats for this society', 'error');
+    } finally {
+      setIsLoadingFlats(false);
+    }
+  };
+
+  const fetchFlats = async () => {
+    setIsLoadingFlats(true);
+    try {
+      const response = await getFlats();
+      setFlats((response.data?.data || []).filter(flat => !flat.isOccupied));
+    } catch (error) {
+      showToast('Unable to load flats for this society', 'error');
+    } finally {
+      setIsLoadingFlats(false);
+    }
+  };
+
+  const handleFlatSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await createFlat({ ...flatForm, floorNumber: Number(flatForm.floorNumber) });
+      showToast(response.data?.message || 'Flat created successfully', 'success');
+      setFlatForm({ flatNumber: '', blockName: '', floorNumber: '' });
+      setFlatModalOpen(false);
+      fetchFlats();
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Unable to create flat', 'error');
     }
   };
 
@@ -147,36 +191,36 @@ export default function AdminDashboard() {
   const handleResidentSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createResident(residentForm);
-      showToast('Resident added successfully', 'success');
+      const response = await createResident({ ...residentForm, flatId: Number(residentForm.flatId), fullName: residentForm.name });
+      showToast(response.data?.message || 'Resident added successfully', 'success');
       setResidentModalOpen(false);
       fetchResidents();
     } catch (error) {
-      showToast('Error adding resident', error);
+      showToast(error.response?.data?.message || 'Error adding resident', 'error');
     }
   };
 
   const handleGuardSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createGuard(guardForm);
-      showToast('Guard added successfully', 'success');
+      const response = await createGuard({ ...guardForm, fullName: guardForm.name, joiningDate: guardForm.joiningDate || new Date().toISOString().slice(0, 10), shiftType: guardForm.shiftType === 'EVENING' ? 'AFTERNOON' : guardForm.shiftType });
+      showToast(response.data?.message || 'Guard added successfully', 'success');
       setGuardModalOpen(false);
       fetchGuards();
     } catch (error) {
-      showToast('Error adding guard', error);
+      showToast(error.response?.data?.message || 'Error adding guard', 'error');
     }
   };
 
   const handleNoticeSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createNotice(noticeForm);
-      showToast('Notice created successfully', 'success');
+      const response = await createNotice({ ...noticeForm, audience: noticeForm.audience === 'RESIDENTS' ? 'RESIDENT' : noticeForm.audience === 'GUARDS' ? 'SECURITY_GUARD' : noticeForm.audience, priority: noticeForm.priority === 'URGENT' ? 'HIGH' : noticeForm.priority });
+      showToast(response.data?.message || 'Notice created successfully', 'success');
       setNoticeModalOpen(false);
       fetchNotices();
     } catch (error) {
-      showToast('Error creating notice', error);
+      showToast(error.response?.data?.message || 'Error creating notice', 'error');
     }
   };
 
@@ -219,6 +263,7 @@ export default function AdminDashboard() {
           <nav className="p-4 space-y-1">
             {[
               { id: 'dashboard', icon: Activity, label: 'Dashboard' },
+              { id: 'flats', icon: Building2, label: 'Flats' },
               { id: 'residents', icon: Users, label: 'Residents' },
               { id: 'guards', icon: Shield, label: 'Guards' },
               { id: 'complaints', icon: AlertCircle, label: 'Complaints' },
@@ -329,11 +374,30 @@ export default function AdminDashboard() {
               )}
 
               {/* RESIDENTS TAB */}
+              {activeTab === 'flats' && (
+                <div className="bg-gray-800 border border-gray-700/50 rounded-2xl shadow-xl overflow-hidden">
+                  <div className="p-6 border-b border-gray-700/50 flex justify-between items-center">
+                    <h3 className="font-semibold text-lg">Manage Flats</h3>
+                    <button onClick={() => setFlatModalOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl flex items-center transition-colors"><Plus className="w-4 h-4 mr-2" /> Add Flat</button>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead className="bg-gray-900/50 text-gray-400 text-sm"><tr><th className="p-4 font-medium">Block</th><th className="p-4 font-medium">Flat</th><th className="p-4 font-medium">Floor</th><th className="p-4 font-medium">Status</th></tr></thead>
+                      <tbody className="divide-y divide-gray-700/50">
+                        {flats.map(flat => <tr key={flat.id}><td className="p-4">{flat.blockName}</td><td className="p-4 font-medium">{flat.flatNumber}</td><td className="p-4">{flat.floorNumber}</td><td className="p-4 text-emerald-400">Vacant</td></tr>)}
+                        {!isLoadingFlats && flats.length === 0 && <tr><td colSpan="4" className="p-6 text-center text-gray-400">No flats have been added yet.</td></tr>}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* RESIDENTS TAB */}
               {activeTab === 'residents' && (
                 <div className="bg-gray-800 border border-gray-700/50 rounded-2xl shadow-xl overflow-hidden">
                   <div className="p-6 border-b border-gray-700/50 flex justify-between items-center">
                     <h3 className="font-semibold text-lg">Manage Residents</h3>
-                    <button onClick={() => setResidentModalOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl flex items-center transition-colors">
+                    <button onClick={openResidentModal} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl flex items-center transition-colors">
                       <UserPlus className="w-4 h-4 mr-2" /> Add Resident
                     </button>
                   </div>
@@ -351,7 +415,7 @@ export default function AdminDashboard() {
                       <tbody className="divide-y divide-gray-700/50">
                         {residents.map((r, idx) => (
                           <tr key={idx} className="hover:bg-gray-700/20 transition-colors">
-                            <td className="p-4 font-medium">{r.name}</td>
+                            <td className="p-4 font-medium">{r.fullName}</td>
                             <td className="p-4 text-gray-400">{r.email}</td>
                             <td className="p-4">{r.flatNumber}</td>
                             <td className="p-4">
@@ -393,7 +457,7 @@ export default function AdminDashboard() {
                       <tbody className="divide-y divide-gray-700/50">
                         {guards.map((g, idx) => (
                           <tr key={idx} className="hover:bg-gray-700/20 transition-colors">
-                            <td className="p-4 font-medium">{g.name}</td>
+                            <td className="p-4 font-medium">{g.fullName}</td>
                             <td className="p-4 text-gray-400">{g.employeeId}</td>
                             <td className="p-4">{g.shiftType}</td>
                             <td className="p-4">
@@ -518,6 +582,20 @@ export default function AdminDashboard() {
 
       {/* MODALS */}
       {/* Resident Modal */}
+      {isFlatModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div className="p-6 border-b border-gray-800 flex justify-between items-center"><h3 className="text-xl font-bold">Add Flat</h3><button onClick={() => setFlatModalOpen(false)}><X className="text-gray-400 hover:text-white" /></button></div>
+            <form onSubmit={handleFlatSubmit} className="p-6 space-y-4">
+              <div><label className="block text-sm text-gray-400 mb-1">Block</label><input required className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white" value={flatForm.blockName} onChange={e => setFlatForm({...flatForm, blockName: e.target.value})} placeholder="e.g. A" /></div>
+              <div className="grid grid-cols-2 gap-4"><div><label className="block text-sm text-gray-400 mb-1">Flat Number</label><input required className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white" value={flatForm.flatNumber} onChange={e => setFlatForm({...flatForm, flatNumber: e.target.value})} placeholder="e.g. 101" /></div><div><label className="block text-sm text-gray-400 mb-1">Floor</label><input required min="0" type="number" className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white" value={flatForm.floorNumber} onChange={e => setFlatForm({...flatForm, floorNumber: e.target.value})} placeholder="e.g. 1" /></div></div>
+              <button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-medium">Create Flat</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Resident Modal */}
       {isResidentModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
@@ -529,7 +607,13 @@ export default function AdminDashboard() {
               <div><label className="block text-sm text-gray-400 mb-1">Full Name</label><input required className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white" value={residentForm.name} onChange={e => setResidentForm({...residentForm, name: e.target.value})} /></div>
               <div><label className="block text-sm text-gray-400 mb-1">Email</label><input required type="email" className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white" value={residentForm.email} onChange={e => setResidentForm({...residentForm, email: e.target.value})} /></div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-sm text-gray-400 mb-1">Flat Number</label><input required className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white" value={residentForm.flatNumber} onChange={e => setResidentForm({...residentForm, flatNumber: e.target.value})} /></div>
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">Flat</label>
+                  <select required disabled={isLoadingFlats || flats.length === 0} className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60" value={residentForm.flatId} onChange={e => setResidentForm({...residentForm, flatId: e.target.value})}>
+                    <option value="">{isLoadingFlats ? 'Loading flats...' : flats.length === 0 ? 'No flats available' : 'Select a flat'}</option>
+                    {flats.map(flat => <option key={flat.id} value={flat.id}>{flat.blockName ? `${flat.blockName} - ` : ''}{flat.flatNumber}</option>)}
+                  </select>
+                </div>
                 <div><label className="block text-sm text-gray-400 mb-1">Mobile</label><input required className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white" value={residentForm.mobileNumber} onChange={e => setResidentForm({...residentForm, mobileNumber: e.target.value})} /></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -554,7 +638,7 @@ export default function AdminDashboard() {
               <div><label className="block text-sm text-gray-400 mb-1">Full Name</label><input required className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white" value={guardForm.name} onChange={e => setGuardForm({...guardForm, name: e.target.value})} /></div>
               <div><label className="block text-sm text-gray-400 mb-1">Email</label><input required type="email" className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white" value={guardForm.email} onChange={e => setGuardForm({...guardForm, email: e.target.value})} /></div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-sm text-gray-400 mb-1">Employee ID</label><input required className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white" value={guardForm.employeeId} onChange={e => setGuardForm({...guardForm, employeeId: e.target.value})} /></div>
+                
                 <div><label className="block text-sm text-gray-400 mb-1">Mobile</label><input required className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white" value={guardForm.mobileNumber} onChange={e => setGuardForm({...guardForm, mobileNumber: e.target.value})} /></div>
               </div>
               <div className="grid grid-cols-2 gap-4">

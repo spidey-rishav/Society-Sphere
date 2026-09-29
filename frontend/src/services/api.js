@@ -8,7 +8,10 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) {
+  // Login must not reuse a stale token. Other auth routes, such as profile
+  // completion, require the token that was issued when the user signed in.
+  const isPublicRequest = config.url === '/api/auth/login';
+  if (token && !isPublicRequest) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;

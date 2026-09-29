@@ -39,6 +39,5 @@ public class CreateSecurityGuardRequest {
     @NotNull(message = "Joining date is required")
     private LocalDate joiningDate;
 
-    @NotBlank(message = "Employee ID is required")
     private String employeeId;
 }
