@@ -248,6 +248,9 @@ public class AdminServiceImpl implements AdminService {
                 .dateOfBirth(resident.getDateOfBirth())
                 .occupation(resident.getOccupation())
                 .profileImage(resident.getProfileImage())
+                .alternateMobileNumber(resident.getAlternateMobileNumber())
+                .emergencyContactName(resident.getEmergencyContactName())
+                .emergencyContactNumber(resident.getEmergencyContactNumber())
                 .build();
     }
 

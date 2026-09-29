@@ -3,6 +3,8 @@ import api from './api';
 // Residents
 export const getFlats = () => api.get('/api/admin/flats');
 export const createFlat = (data) => api.post('/api/admin/flats', data);
+export const getAdmins = () => api.get('/api/admin/admins');
+export const createSocietyAdmin = (data) => api.post('/api/admin/admins', data);
 export const getResidents = (societyId) => api.get('/api/admin/residents', { params: { societyId } });
 export const createResident = (data) => api.post('/api/admin/residents', data);
 export const updateResident = (id, data) => api.put(`/api/admin/residents/${id}`, data);

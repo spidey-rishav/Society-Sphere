@@ -29,4 +29,7 @@ public class ResidentResponse {
     private LocalDate dateOfBirth;
     private String occupation;
     private String profileImage;
+    private String alternateMobileNumber;
+    private String emergencyContactName;
+    private String emergencyContactNumber;
 }

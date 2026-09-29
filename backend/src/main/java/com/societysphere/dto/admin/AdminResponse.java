@@ -26,4 +26,6 @@ public class AdminResponse {
 
     private String designation;
 
+    private Boolean active;
+
 }

@@ -9,7 +9,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import useToast from '../../hooks/useToast';
 import {
-  getFlats, createFlat, getResidents, createResident, deleteResident,
+  getFlats, createFlat, getAdmins, createSocietyAdmin, getResidents, createResident, deleteResident,
   getGuards, createGuard, deleteGuard,
   getNotices, createNotice, deleteNotice,
   getResidentComplaints, getGuardComplaints, updateComplaint,
@@ -25,6 +25,7 @@ export default function AdminDashboard() {
 
   // Data states
   const [residents, setResidents] = useState([]);
+  const [admins, setAdmins] = useState([]);
   const [flats, setFlats] = useState([]);
   const [isLoadingFlats, setIsLoadingFlats] = useState(false);
   const [guards, setGuards] = useState([]);
@@ -34,15 +35,18 @@ export default function AdminDashboard() {
 
   // Modals state
   const [isResidentModalOpen, setResidentModalOpen] = useState(false);
+  const [isAdminModalOpen, setAdminModalOpen] = useState(false);
   const [isFlatModalOpen, setFlatModalOpen] = useState(false);
   const [isGuardModalOpen, setGuardModalOpen] = useState(false);
   const [isNoticeModalOpen, setNoticeModalOpen] = useState(false);
   const [complaintModalData, setComplaintModalData] = useState(null);
+  const [selectedPerson, setSelectedPerson] = useState(null);
 
   // Forms state
   const [residentForm, setResidentForm] = useState({
     name: '', email: '', flatId: '', mobileNumber: '', gender: 'MALE', residentType: 'OWNER'
   });
+  const [adminForm, setAdminForm] = useState({ fullName: '', email: '', mobileNumber: '' });
   const [flatForm, setFlatForm] = useState({ flatNumber: '', blockName: '', floorNumber: '' });
   const [guardForm, setGuardForm] = useState({
     name: '', email: '', mobileNumber: '', gender: 'MALE', shiftType: 'MORNING', joiningDate: ''
@@ -61,6 +65,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (activeTab === 'dashboard') fetchStats();
     if (activeTab === 'flats') fetchFlats();
+    if (activeTab === 'admins') fetchAdmins();
     if (activeTab === 'residents') fetchResidents();
     if (activeTab === 'guards') fetchGuards();
     if (activeTab === 'complaints') fetchComplaints();
@@ -94,6 +99,18 @@ export default function AdminDashboard() {
       setResidents(res.data?.data || []);
     } catch (error) {
       showToast('Failed to fetch residents', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchAdmins = async () => {
+    setIsLoading(true);
+    try {
+      const res = await getAdmins();
+      setAdmins(res.data?.data || []);
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Failed to fetch administrators', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -200,6 +217,19 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleAdminSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await createSocietyAdmin(adminForm);
+      showToast(response.data?.message || 'Administrator added successfully', 'success');
+      setAdminModalOpen(false);
+      setAdminForm({ fullName: '', email: '', mobileNumber: '' });
+      fetchAdmins();
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Error adding administrator', 'error');
+    }
+  };
+
   const handleGuardSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -263,6 +293,7 @@ export default function AdminDashboard() {
           <nav className="p-4 space-y-1">
             {[
               { id: 'dashboard', icon: Activity, label: 'Dashboard' },
+              { id: 'admins', icon: ShieldAlert, label: 'Admins' },
               { id: 'flats', icon: Building2, label: 'Flats' },
               { id: 'residents', icon: Users, label: 'Residents' },
               { id: 'guards', icon: Shield, label: 'Guards' },
@@ -373,6 +404,19 @@ export default function AdminDashboard() {
                 </>
               )}
 
+              {/* ADMINS TAB */}
+              {activeTab === 'admins' && (
+                <div className="bg-gray-800 border border-gray-700/50 rounded-2xl shadow-xl overflow-hidden">
+                  <div className="p-6 border-b border-gray-700/50 flex justify-between items-center">
+                    <div><h3 className="font-semibold text-lg">Manage Administrators</h3><p className="mt-1 text-sm text-gray-400">New administrators are added to this society automatically.</p></div>
+                    <button onClick={() => setAdminModalOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl flex items-center transition-colors"><UserPlus className="w-4 h-4 mr-2" /> Add Admin</button>
+                  </div>
+                  <div className="overflow-x-auto"><table className="w-full text-left"><thead className="bg-gray-900/50 text-gray-400 text-sm"><tr><th className="p-4 font-medium">Name</th><th className="p-4 font-medium">Email</th><th className="p-4 font-medium">Mobile</th><th className="p-4 font-medium">Role</th><th className="p-4 font-medium">Status</th></tr></thead>
+                    <tbody className="divide-y divide-gray-700/50">{admins.map((admin) => <tr key={admin.id} className="hover:bg-gray-700/20"><td className="p-4 font-medium">{admin.fullName}</td><td className="p-4 text-gray-400">{admin.email}</td><td className="p-4">{admin.mobileNumber}</td><td className="p-4">{admin.adminType}</td><td className="p-4"><span className={`px-2 py-1 text-xs rounded-lg border ${admin.active ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-red-500/20 text-red-400 border-red-500/50'}`}>{admin.active ? 'Active' : 'Inactive'}</span></td></tr>)}</tbody>
+                  </table></div>
+                </div>
+              )}
+
               {/* RESIDENTS TAB */}
               {activeTab === 'flats' && (
                 <div className="bg-gray-800 border border-gray-700/50 rounded-2xl shadow-xl overflow-hidden">
@@ -414,7 +458,7 @@ export default function AdminDashboard() {
                       </thead>
                       <tbody className="divide-y divide-gray-700/50">
                         {residents.map((r, idx) => (
-                          <tr key={idx} className="hover:bg-gray-700/20 transition-colors">
+                          <tr key={idx} onClick={() => setSelectedPerson({ type: 'Resident', data: r })} className="cursor-pointer hover:bg-gray-700/20 transition-colors">
                             <td className="p-4 font-medium">{r.fullName}</td>
                             <td className="p-4 text-gray-400">{r.email}</td>
                             <td className="p-4">{r.flatNumber}</td>
@@ -424,7 +468,7 @@ export default function AdminDashboard() {
                               </span>
                             </td>
                             <td className="p-4 text-right">
-                              <button onClick={() => deleteResident(r.id).then(() => { fetchResidents(); showToast('Deleted', 'info'); })} className="text-red-400 hover:text-red-300">Delete</button>
+                              <button onClick={(event) => { event.stopPropagation(); deleteResident(r.id).then(() => { fetchResidents(); showToast('Deleted', 'info'); }); }} className="text-red-400 hover:text-red-300">Delete</button>
                             </td>
                           </tr>
                         ))}
@@ -456,7 +500,7 @@ export default function AdminDashboard() {
                       </thead>
                       <tbody className="divide-y divide-gray-700/50">
                         {guards.map((g, idx) => (
-                          <tr key={idx} className="hover:bg-gray-700/20 transition-colors">
+                          <tr key={idx} onClick={() => setSelectedPerson({ type: 'Guard', data: g })} className="cursor-pointer hover:bg-gray-700/20 transition-colors">
                             <td className="p-4 font-medium">{g.fullName}</td>
                             <td className="p-4 text-gray-400">{g.employeeId}</td>
                             <td className="p-4">{g.shiftType}</td>
@@ -466,7 +510,7 @@ export default function AdminDashboard() {
                               </span>
                             </td>
                             <td className="p-4 text-right">
-                              <button onClick={() => deleteGuard(g.id).then(() => { fetchGuards(); showToast('Deleted', 'info'); })} className="text-red-400 hover:text-red-300">Delete</button>
+                              <button onClick={(event) => { event.stopPropagation(); deleteGuard(g.id).then(() => { fetchGuards(); showToast('Deleted', 'info'); }); }} className="text-red-400 hover:text-red-300">Delete</button>
                             </td>
                           </tr>
                         ))}
@@ -580,7 +624,51 @@ export default function AdminDashboard() {
         </div>
       </main>
 
+      {selectedPerson && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <section className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-gray-700 bg-gray-900 p-6 shadow-2xl">
+            <div className="mb-6 flex items-start justify-between">
+              <div><h3 className="text-xl font-bold">{selectedPerson.type} profile</h3><p className="text-sm text-gray-400">Full account and contact information.</p></div>
+              <button onClick={() => setSelectedPerson(null)} className="text-gray-400 hover:text-white">Close</button>
+            </div>
+            <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
+              <p><span className="text-gray-400">Name:</span> {selectedPerson.data.fullName || '—'}</p>
+              <p><span className="text-gray-400">Email:</span> {selectedPerson.data.email || '—'}</p>
+              <p><span className="text-gray-400">Mobile:</span> {selectedPerson.data.mobileNumber || '—'}</p>
+              <p><span className="text-gray-400">Gender:</span> {selectedPerson.data.gender || '—'}</p>
+              {selectedPerson.type === 'Resident' ? <>
+                <p><span className="text-gray-400">Flat:</span> {selectedPerson.data.blockName ? `${selectedPerson.data.blockName} - ` : ''}{selectedPerson.data.flatNumber || '—'}</p>
+                <p><span className="text-gray-400">Resident type:</span> {selectedPerson.data.residentType || '—'}</p>
+                <p><span className="text-gray-400">Date of birth:</span> {selectedPerson.data.dateOfBirth || '—'}</p>
+                <p><span className="text-gray-400">Occupation:</span> {selectedPerson.data.occupation || '—'}</p>
+                <p><span className="text-gray-400">Alternate mobile:</span> {selectedPerson.data.alternateMobileNumber || '—'}</p>
+                <p><span className="text-gray-400">Emergency contact:</span> {selectedPerson.data.emergencyContactName || '—'} {selectedPerson.data.emergencyContactNumber ? `(${selectedPerson.data.emergencyContactNumber})` : ''}</p>
+              </> : <>
+                <p><span className="text-gray-400">Employee ID:</span> {selectedPerson.data.employeeId || '—'}</p>
+                <p><span className="text-gray-400">Shift:</span> {selectedPerson.data.shiftType || '—'}</p>
+                <p><span className="text-gray-400">Joining date:</span> {selectedPerson.data.joiningDate || '—'}</p>
+              </>}
+              <p><span className="text-gray-400">Status:</span> {selectedPerson.data.active ? 'Active' : 'Inactive'}</p>
+            </div>
+          </section>
+        </div>
+      )}
+
       {/* MODALS */}
+      {isAdminModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div className="p-6 border-b border-gray-800 flex justify-between items-center"><div><h3 className="text-xl font-bold">Add Administrator</h3><p className="mt-1 text-sm text-gray-400">They will be added to this society automatically.</p></div><button onClick={() => setAdminModalOpen(false)}><X className="text-gray-400 hover:text-white" /></button></div>
+            <form onSubmit={handleAdminSubmit} className="p-6 space-y-4">
+              <div><label className="block text-sm text-gray-400 mb-1">Full Name</label><input required className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white" value={adminForm.fullName} onChange={e => setAdminForm({ ...adminForm, fullName: e.target.value })} /></div>
+              <div><label className="block text-sm text-gray-400 mb-1">Email</label><input required type="email" className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white" value={adminForm.email} onChange={e => setAdminForm({ ...adminForm, email: e.target.value })} /></div>
+              <div><label className="block text-sm text-gray-400 mb-1">Mobile Number</label><input required inputMode="numeric" maxLength="10" className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white" value={adminForm.mobileNumber} onChange={e => setAdminForm({ ...adminForm, mobileNumber: e.target.value.replace(/\D/g, '') })} /></div>
+              <button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-medium">Create Admin and Send Credentials</button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Resident Modal */}
       {isFlatModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">

@@ -64,10 +64,44 @@ public class SocietyApprovalController {
     public ApiResponse<String> resendCredentials(@PathVariable Long id) {
         Society society = societies.findById(id).orElseThrow(() -> new ResourceNotFoundException("Society not found"));
         Admin admin = admins.findBySociety(society).stream().findFirst().orElseThrow(() -> new BadRequestException("Society does not have an administrator account"));
+        return resendAdminCredentials(admin);
+    }
+
+    @PostMapping("/admins/{adminId}/send-credentials")
+    public ApiResponse<String> resendAdminCredentials(@PathVariable Long adminId) {
+        Admin admin = admins.findById(adminId).orElseThrow(() -> new ResourceNotFoundException("Administrator not found"));
+        return resendAdminCredentials(admin);
+    }
+
+    private ApiResponse<String> resendAdminCredentials(Admin admin) {
+        ensureMailIsConfigured();
         String password = temporaryPassword();
+        sendCredentialsOrThrow(admin.getUser(), password);
         admin.getUser().setPassword(encoder.encode(password));
         users.save(admin.getUser());
-        return deliverCredentials(admin.getUser(), password, "Email delivery is disabled. Set APP_MAIL_ENABLED=true and configure MAIL_USERNAME and MAIL_PASSWORD first.");
+        return ApiResponse.success("Credentials emailed to " + admin.getUser().getEmail(), null);
+    }
+
+    private void ensureMailIsConfigured() {
+        if (!mailEnabled) {
+            throw new BadRequestException("Email delivery is disabled. Set APP_MAIL_ENABLED=true and restart the backend.");
+        }
+        if (senderEmail == null || senderEmail.isBlank()) {
+            throw new BadRequestException("MAIL_USERNAME is missing. Configure it and restart the backend.");
+        }
+    }
+
+    private void sendCredentialsOrThrow(User user, String password) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(senderEmail);
+            message.setTo(user.getEmail());
+            message.setSubject("Society Sphere administrator credentials");
+            message.setText("Your Society Sphere administrator account is ready.\n\nLogin email: " + user.getEmail() + "\nTemporary password: " + password + "\n\nPlease sign in and complete your profile.");
+            mail.send(message);
+        } catch (MailException ex) {
+            throw new BadRequestException("Credentials were not sent. Check Gmail SMTP settings and try again; the administrator password was not changed.");
+        }
     }
 
     private String temporaryPassword() {
