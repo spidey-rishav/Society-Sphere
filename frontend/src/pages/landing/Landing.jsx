@@ -13,7 +13,7 @@ import Contact from '../../components/landing/Contact'
 
 const Landing = () => {
   return (
-    <>
+    <div className="min-h-screen w-full overflow-x-hidden bg-white text-gray-900">
         <Navbar/>
         <Intro/>
         <About/>
@@ -23,7 +23,7 @@ const Landing = () => {
         <SocialMedia/>
         <FAQ/>
         <Footer/>
-    </>
+    </div>
   )
 }
 

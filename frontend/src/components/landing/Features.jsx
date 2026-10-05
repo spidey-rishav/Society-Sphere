@@ -2,13 +2,13 @@ import React from 'react';
 
 const Features = () => {
   return (
-    <section id="features" className="py-20 bg-gray-950 text-white relative">
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px]" />
+    <section id="features" className="py-12 md:py-20 bg-gray-950 text-white relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-72 md:w-96 h-72 md:h-96 bg-purple-600/10 rounded-full blur-[120px] pointer-events-none" />
       
-      <div className="max-w-6xl mx-auto px-4 relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-400">Core Features</h2>
-          <p className="text-gray-400 text-lg">Everything you need to manage your society effortlessly.</p>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="text-center mb-10 md:mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-400">Core Features</h2>
+          <p className="text-gray-400 text-base sm:text-lg">Everything you need to manage your society effortlessly.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

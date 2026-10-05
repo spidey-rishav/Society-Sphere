@@ -24,45 +24,41 @@ const Unique = () => {
     };
   
   return (
-    <>
-    <div className='flex justify-center'>
-        <div className='py-10 flex flex-col items-center justify-evenly shadow-2xl w-3/4 bg-[#0b2d35] text-[#ffffff] rounded-4xl'>
-            <div className='flex flex-col items-center'>
-                <h1 className='text-3xl font-bold'>Why choose Society Sphere?</h1>
-                <h3 className='text-xl'>Society Sphere is a smart, user-friendly platform that simplifies and centralizes all aspects of housing society management.</h3>
+    <section className='py-10 md:py-16 flex justify-center px-4'>
+        <div className='py-8 px-6 sm:px-10 flex flex-col items-center justify-between shadow-2xl w-full max-w-5xl bg-[#0b2d35] text-[#ffffff] rounded-3xl md:rounded-4xl gap-6'>
+            <div className='flex flex-col items-center text-center max-w-2xl'>
+                <h2 className='text-2xl sm:text-3xl font-bold mb-2'>Why choose Society Sphere?</h2>
+                <p className='text-sm sm:text-base text-gray-200'>Society Sphere is a smart, user-friendly platform that simplifies and centralizes all aspects of housing society management.</p>
             </div>
-            <div className='flex items-center justify-around'>
-              <div className="max-w-md mx-auto mt-10 space-y-2">
-                {data.map((item, index) => (
-                  <div key={index} className="rounded-xl overflow-hidden shadow-sm">
-                    
-                    {/* Title */}
-                    <button
-                      onClick={() => toggle(index)}
-                      className="w-full text-[#f7f7f7] text-left px-4 py-3 bg-gradient-to-r from-[#5b42e4] via-[#8137e9] to-[#7f32da] flex justify-between items-center"
-                    >
-                      <span>{item.title}</span>
-                      <span className="text-xl">
-                        {activeIndex === index ? "-" : "+"}
-                      </span>
-                    </button>
+            
+            <div className="w-full max-w-xl mx-auto space-y-3">
+              {data.map((item, index) => (
+                <div key={index} className="rounded-xl overflow-hidden shadow-sm">
+                  
+                  {/* Title */}
+                  <button
+                    onClick={() => toggle(index)}
+                    className="w-full text-[#f7f7f7] text-left px-4 py-3 bg-gradient-to-r from-[#5b42e4] via-[#8137e9] to-[#7f32da] flex justify-between items-center text-base sm:text-lg font-medium"
+                  >
+                    <span>{item.title}</span>
+                    <span className="text-xl font-bold">
+                      {activeIndex === index ? "−" : "+"}
+                    </span>
+                  </button>
 
-                    {/* Content */}
-                    <div
-                      className={`bg-[#f7f7f7] border-b px-4 transition-all duration-300 ease-in-out overflow-hidden ${
-                        activeIndex === index ? "max-h-40 py-3" : "max-h-0"
-                      }`}
-                    >
-                      <p className='text-gray-500'>{item.content}</p>
-                    </div>
+                  {/* Content */}
+                  <div
+                    className={`bg-[#f7f7f7] border-b px-4 transition-all duration-300 ease-in-out overflow-hidden ${
+                      activeIndex === index ? "max-h-48 py-3" : "max-h-0 py-0"
+                    }`}
+                  >
+                    <p className='text-gray-700 text-sm sm:text-base'>{item.content}</p>
                   </div>
-                ))}
-              </div>
-              <div className='w-100'></div>
+                </div>
+              ))}
             </div>
         </div>
-    </div>
-    </>
+    </section>
   )
 }
 

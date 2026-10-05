@@ -53,34 +53,34 @@ const FAQ = () => {
   };
 
   return (
-    <div className="w-3/4 mx-auto mt-10 space-y-2 pb-20">
-      <h1 className='text-3xl font-bold'>FAQs on Society Sphere</h1>
+    <section className="w-full max-w-4xl mx-auto px-4 mt-8 md:mt-12 space-y-3 pb-12 md:pb-20">
+      <h2 className='text-2xl sm:text-3xl font-bold text-gray-900 text-center md:text-left mb-6'>FAQs on Society Sphere</h2>
       {data.map((item, index) => (
-        <div key={index} className="rounded-xl overflow-hidden shadow-md border-b border-[#0b2d35] shadow-md active:scale-101 transform duration-200 ease-in-out">
+        <div key={index} className="rounded-xl overflow-hidden shadow-sm border border-gray-200">
           
           {/* Title */}
           <button
             onClick={() => toggle(index)}
-            className="w-full text-black bg-gray-100 text-left text-xl px-4 py-5 hover:bg-gray-200 flex justify-between items-center"
+            className="w-full text-black bg-gray-50 text-left text-base sm:text-lg font-medium px-4 sm:px-5 py-4 hover:bg-gray-100 flex justify-between items-center transition-colors"
           >
-            <span>{item.title}</span>
-            <span className="text-xl">
-              {activeIndex === index ? "-" : "+"}
+            <span className="pr-4">{item.title}</span>
+            <span className="text-xl font-bold text-indigo-600 flex-shrink-0">
+              {activeIndex === index ? "−" : "+"}
             </span>
           </button>
 
           {/* Content */}
           <div
-            className={`text-[#ffffff] px-4 transition-all duration-300 ease-in-out overflow-hidden ${
-              activeIndex === index ? "max-h-40 py-3" : "max-h-0"
+            className={`bg-white px-4 sm:px-5 transition-all duration-300 ease-in-out overflow-hidden ${
+              activeIndex === index ? "max-h-60 py-4 border-t border-gray-100" : "max-h-0 py-0"
             }`}
           >
-            <p className="text-gray-600">{item.content}</p>
+            <p className="text-gray-600 text-sm sm:text-base leading-relaxed">{item.content}</p>
           </div>
 
         </div>
       ))}
-    </div>
+    </section>
   );
 };
 
