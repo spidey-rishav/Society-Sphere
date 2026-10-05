@@ -1,5 +1,5 @@
 import React from 'react'
-import '../../styles/rotate.css'
+import '../../Styles/rotate.css'
 import SocietySphere from '../../assets/logos/Society Sphere.png'
 
 const Rotation = () => {
